@@ -1,7 +1,7 @@
 """Data fetching utilities for NBA defensive evaluation.
 
-This module provides functions to fetch All-Defensive Team rosters
-and player award status for model evaluation.
+This module provides functions to fetch All-Defensive Team rosters,
+DPOY winners, and player award status for model evaluation.
 
 Uses nba_api.stats.endpoints.playerawards for dynamic queries,
 with static cache for batch operations.
@@ -13,15 +13,84 @@ from typing import Optional
 import pandas as pd
 from nba_api.stats.endpoints import playerawards
 
+
+# =============================================================================
+# DPOY (Defensive Player of the Year) Winners
+# =============================================================================
+# Format: {season: (player_name, player_id)}
+DPOY_WINNERS = {
+    "2024-25": ("Evan Mobley", 1630596),
+    "2023-24": ("Rudy Gobert", 203497),
+    "2022-23": ("Jaren Jackson Jr.", 1628991),
+    "2021-22": ("Marcus Smart", 203935),
+    "2020-21": ("Rudy Gobert", 203497),
+    "2019-20": ("Giannis Antetokounmpo", 203507),
+    "2018-19": ("Rudy Gobert", 203497),
+    "2017-18": ("Rudy Gobert", 203497),
+    "2016-17": ("Draymond Green", 203110),
+}
+
+
+# =============================================================================
+# Award Eligibility Rules (Minimum Games Played)
+# =============================================================================
+# 2023-24+: 65 games required for major awards
+# Prior seasons: No hard rule, but 50+ was typical for serious candidates
+AWARD_ELIGIBILITY = {
+    "2024-25": 65,
+    "2023-24": 65,
+    "2022-23": 50,  # Pre-65 rule era
+    "2021-22": 50,
+    "2020-21": 50,
+    "2019-20": 50,
+    "2018-19": 50,
+    "2017-18": 50,
+    "2016-17": 50,
+    "default": 50,
+}
+
+
+def get_dpoy_winner(season: str) -> tuple[str, int] | None:
+    """Get DPOY winner for a given season.
+
+    Args:
+        season: Season string (e.g., "2023-24")
+
+    Returns:
+        Tuple of (player_name, player_id) or None if not found.
+    """
+    return DPOY_WINNERS.get(season)
+
+
+def get_min_games_for_awards(season: str) -> int:
+    """Get minimum games played required for award eligibility.
+
+    Args:
+        season: Season string (e.g., "2023-24")
+
+    Returns:
+        Minimum games threshold.
+    """
+    return AWARD_ELIGIBILITY.get(season, AWARD_ELIGIBILITY["default"])
+
+
 # Static All-Defensive Team data (from Basketball Reference)
 # Used for batch evaluation to avoid 500+ API calls
 # Format: {season: [(player_name, player_id, team_level, position), ...]}
 ALL_DEFENSIVE_TEAMS = {
     "2024-25": [
-        # First Team (announced June 2025 - placeholder based on projections)
-        ("Victor Wembanyama", 1641705, "1st", "C"),
-        ("Rudy Gobert", 203497, "2nd", "C"),  # Confirmed via API
-        # Add more as announced...
+        # First Team (announced May 22, 2025)
+        ("Evan Mobley", 1630596, "1st", "C"),
+        ("Draymond Green", 203110, "1st", "F"),
+        ("Dyson Daniels", 1630700, "1st", "G"),
+        ("Luguentz Dort", 1629652, "1st", "G"),
+        ("Amen Thompson", 1641708, "1st", "F"),
+        # Second Team
+        ("Toumani Camara", 1641739, "2nd", "F"),
+        ("Rudy Gobert", 203497, "2nd", "C"),
+        ("Jaren Jackson Jr.", 1628991, "2nd", "F"),
+        ("Jalen Williams", 1631114, "2nd", "F"),
+        ("Ivica Zubac", 1627826, "2nd", "C"),
     ],
     "2023-24": [
         # First Team

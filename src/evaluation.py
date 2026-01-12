@@ -30,7 +30,11 @@ from typing import Any
 import pandas as pd
 import numpy as np
 
-from data_fetcher import get_all_defensive_teams
+from data_fetcher import (
+    get_all_defensive_teams,
+    get_dpoy_winner,
+    get_min_games_for_awards,
+)
 
 # Minimum games required for 2023-24+ seasons
 MIN_GAMES_2024 = 65
@@ -108,6 +112,59 @@ class MissAnalysis:
 
 
 @dataclass
+class DPOYEvaluation:
+    """DPOY prediction evaluation metrics."""
+
+    season: str
+    actual_dpoy_name: str | None  # Actual DPOY winner
+    actual_dpoy_id: int | None
+    actual_dpoy_rank: int | None  # Where actual DPOY ranks in model
+    predicted_dpoy_name: str  # Model's top eligible player
+    predicted_dpoy_rank: int  # Should be 1 if top player is eligible
+    is_hit: bool  # Did model's prediction match actual?
+    eligible_players_checked: int  # How many players checked for eligibility
+    min_games_required: int  # Games threshold used
+
+    @property
+    def grade(self) -> str:
+        """Letter grade based on actual DPOY's rank in model."""
+        if self.actual_dpoy_rank is None:
+            return "N/A"
+        if self.actual_dpoy_rank == 1:
+            return "A+"
+        elif self.actual_dpoy_rank <= 3:
+            return "A"
+        elif self.actual_dpoy_rank <= 5:
+            return "B"
+        elif self.actual_dpoy_rank <= 10:
+            return "C"
+        elif self.actual_dpoy_rank <= 20:
+            return "D"
+        return "F"
+
+
+@dataclass
+class BenchmarkResult:
+    """Head-to-head comparison between EDI and a competitor metric."""
+
+    season: str
+    competitor_name: str  # e.g., "D-RAPTOR"
+
+    # All-Defense average rank comparison (lower is better)
+    edi_avg_rank: float
+    competitor_avg_rank: float
+
+    # DPOY rank comparison (lower is better)
+    edi_dpoy_rank: int | None
+    competitor_dpoy_rank: int | None
+
+    # Winner determination
+    avg_rank_winner: str  # "EDI", competitor_name, or "TIE"
+    dpoy_winner: str  # "EDI", competitor_name, or "TIE"
+    overall_winner: str  # "EDI", competitor_name, or "TIE"
+
+
+@dataclass
 class SeasonEvaluation:
     """Complete evaluation for a single season."""
 
@@ -121,6 +178,12 @@ class SeasonEvaluation:
 
     # Position breakdown (only for pre-2023-24)
     position_breakdown: dict[str, dict] | None = None
+
+    # DPOY evaluation
+    dpoy_evaluation: DPOYEvaluation | None = None
+
+    # Benchmark against competitors
+    benchmark_results: list[BenchmarkResult] | None = None
 
 
 def classify_positions(pos: str) -> list[str]:
@@ -900,3 +963,313 @@ def evaluate_season_positionless(
         if eval_result.games_filter_applied
         else 0,
     }
+
+
+# =============================================================================
+# DPOY Evaluation Functions
+# =============================================================================
+
+
+def evaluate_dpoy_alignment(
+    model_df: pd.DataFrame,
+    season: str,
+    score_col: str = "EDI_Total",
+    name_col: str = "PLAYER_NAME",
+    games_col: str = "GP",
+) -> DPOYEvaluation:
+    """Evaluate how well the model predicts DPOY.
+
+    This function:
+    1. Gets the actual DPOY winner for the season
+    2. Finds where the actual DPOY ranks in the model
+    3. Finds the model's top eligible player as "predicted DPOY"
+    4. Compares prediction vs actual
+
+    Eligibility: Player must meet minimum games threshold (65 for 2024+, 50 otherwise).
+    This matters because players like Wembanyama might rank #1 statistically
+    but not meet games threshold.
+
+    Args:
+        model_df: DataFrame with model predictions
+        season: Season string (e.g., "2023-24")
+        score_col: Column name for EDI scores
+        name_col: Column name for player names
+        games_col: Column name for games played
+
+    Returns:
+        DPOYEvaluation with prediction metrics
+    """
+    # Get actual DPOY
+    dpoy_info = get_dpoy_winner(season)
+    min_games = get_min_games_for_awards(season)
+
+    actual_dpoy_name = dpoy_info[0] if dpoy_info else None
+    actual_dpoy_id = dpoy_info[1] if dpoy_info else None
+
+    # Sort model by score
+    model_df = model_df.copy()
+    model_df = model_df.sort_values(score_col, ascending=False).reset_index(drop=True)
+
+    # Find actual DPOY's rank in model
+    actual_dpoy_rank = None
+    if actual_dpoy_name:
+        actual_dpoy_rank = _get_player_rank(
+            model_df, actual_dpoy_name, score_col, name_col
+        )
+
+    # Find model's predicted DPOY (first eligible player by score)
+    predicted_dpoy_name = ""
+    predicted_dpoy_rank = 0
+    eligible_checked = 0
+
+    if games_col in model_df.columns:
+        for idx, row in model_df.iterrows():
+            eligible_checked += 1
+            if row[games_col] >= min_games:
+                predicted_dpoy_name = row[name_col]
+                predicted_dpoy_rank = eligible_checked  # 1-indexed rank
+                break
+    else:
+        # No games column, just use top player
+        if len(model_df) > 0:
+            predicted_dpoy_name = model_df.iloc[0][name_col]
+            predicted_dpoy_rank = 1
+            eligible_checked = 1
+
+    # Determine if hit
+    is_hit = actual_dpoy_name is not None and predicted_dpoy_name == actual_dpoy_name
+
+    return DPOYEvaluation(
+        season=season,
+        actual_dpoy_name=actual_dpoy_name,
+        actual_dpoy_id=actual_dpoy_id,
+        actual_dpoy_rank=actual_dpoy_rank,
+        predicted_dpoy_name=predicted_dpoy_name,
+        predicted_dpoy_rank=predicted_dpoy_rank,
+        is_hit=is_hit,
+        eligible_players_checked=eligible_checked,
+        min_games_required=min_games,
+    )
+
+
+def benchmark_against_raptor(
+    model_df: pd.DataFrame,
+    season: str,
+    raptor_df: pd.DataFrame,
+    score_col: str = "EDI_Total",
+    name_col: str = "PLAYER_NAME",
+    raptor_score_col: str = "RAPTOR_DEFENSE",
+    raptor_name_col: str = "player_name",
+) -> BenchmarkResult | None:
+    """Compare EDI vs D-RAPTOR on the same evaluation tasks.
+
+    This is a HEAD-TO-HEAD comparison using:
+    1. Average Rank of All-Defense players (lower is better)
+    2. DPOY prediction rank (lower is better)
+
+    Winner is determined by who achieves lower average rank.
+
+    Args:
+        model_df: DataFrame with EDI predictions
+        season: Season string
+        raptor_df: DataFrame with D-RAPTOR scores
+        score_col: EDI score column
+        name_col: Player name column in model_df
+        raptor_score_col: D-RAPTOR score column
+        raptor_name_col: Player name column in raptor_df
+
+    Returns:
+        BenchmarkResult or None if RAPTOR data unavailable
+    """
+    if raptor_df is None or raptor_df.empty:
+        return None
+
+    # Get ground truth
+    ground_truth = get_all_defensive_teams(season)
+    if ground_truth.empty:
+        return None
+
+    gt_names = set(ground_truth["PLAYER_NAME"])
+
+    # Get DPOY info
+    dpoy_info = get_dpoy_winner(season)
+    dpoy_name = dpoy_info[0] if dpoy_info else None
+
+    # === EDI metrics ===
+    model_df_sorted = model_df.sort_values(score_col, ascending=False).reset_index(
+        drop=True
+    )
+
+    # Calculate EDI avg_rank using existing function
+    edi_tier = calculate_tier_alignment(model_df_sorted, gt_names, score_col, name_col)
+    edi_avg_rank = edi_tier.avg_rank
+
+    edi_dpoy_rank = None
+    if dpoy_name:
+        edi_dpoy_rank = _get_player_rank(
+            model_df_sorted, dpoy_name, score_col, name_col
+        )
+
+    # === RAPTOR metrics ===
+    raptor_df_sorted = raptor_df.sort_values(
+        raptor_score_col, ascending=False
+    ).reset_index(drop=True)
+
+    # Calculate RAPTOR avg_rank using existing function
+    raptor_tier = calculate_tier_alignment(
+        raptor_df_sorted, gt_names, raptor_score_col, raptor_name_col
+    )
+    competitor_avg_rank = raptor_tier.avg_rank
+
+    raptor_dpoy_rank = None
+    if dpoy_name:
+        raptor_dpoy_rank = _get_player_rank(
+            raptor_df_sorted, dpoy_name, raptor_score_col, raptor_name_col
+        )
+
+    # === Determine winners ===
+    # AvgRank winner: lower avg_rank wins (better at ranking All-Defense players)
+    avg_rank_diff = edi_avg_rank - competitor_avg_rank
+
+    if avg_rank_diff < -1.0:  # EDI is lower by 1+ rank = EDI better
+        avg_rank_winner = "EDI"
+    elif avg_rank_diff > 1.0:  # RAPTOR is lower by 1+ rank = RAPTOR better
+        avg_rank_winner = "D-RAPTOR"
+    else:
+        avg_rank_winner = "TIE"
+
+    # DPOY winner: lower rank wins (closer to #1)
+    if edi_dpoy_rank is None and raptor_dpoy_rank is None:
+        dpoy_winner = "TIE"
+    elif edi_dpoy_rank is None:
+        dpoy_winner = "D-RAPTOR"
+    elif raptor_dpoy_rank is None:
+        dpoy_winner = "EDI"
+    elif edi_dpoy_rank < raptor_dpoy_rank:
+        dpoy_winner = "EDI"
+    elif raptor_dpoy_rank < edi_dpoy_rank:
+        dpoy_winner = "D-RAPTOR"
+    else:
+        dpoy_winner = "TIE"
+
+    # Overall winner: needs to win both or win one + tie one
+    wins = {"EDI": 0, "D-RAPTOR": 0}
+    if avg_rank_winner == "EDI":
+        wins["EDI"] += 1
+    elif avg_rank_winner == "D-RAPTOR":
+        wins["D-RAPTOR"] += 1
+
+    if dpoy_winner == "EDI":
+        wins["EDI"] += 1
+    elif dpoy_winner == "D-RAPTOR":
+        wins["D-RAPTOR"] += 1
+
+    if wins["EDI"] > wins["D-RAPTOR"]:
+        overall_winner = "EDI"
+    elif wins["D-RAPTOR"] > wins["EDI"]:
+        overall_winner = "D-RAPTOR"
+    else:
+        overall_winner = "TIE"
+
+    return BenchmarkResult(
+        season=season,
+        competitor_name="D-RAPTOR",
+        edi_avg_rank=edi_avg_rank,
+        competitor_avg_rank=competitor_avg_rank,
+        edi_dpoy_rank=edi_dpoy_rank,
+        competitor_dpoy_rank=raptor_dpoy_rank,
+        avg_rank_winner=avg_rank_winner,
+        dpoy_winner=dpoy_winner,
+        overall_winner=overall_winner,
+    )
+
+
+def generate_dpoy_report(dpoy_eval: DPOYEvaluation) -> str:
+    """Generate report section for DPOY evaluation."""
+    lines = []
+    lines.append("🏆 DPOY ALIGNMENT")
+    lines.append("-" * 40)
+
+    if dpoy_eval.actual_dpoy_name is None:
+        lines.append(f"  No DPOY data available for {dpoy_eval.season}")
+        return "\n".join(lines)
+
+    lines.append(f"  Actual DPOY: {dpoy_eval.actual_dpoy_name}")
+    lines.append(f"  DPOY Rank in Model: #{dpoy_eval.actual_dpoy_rank or 'N/A'}")
+    lines.append(
+        f"  Model Prediction: {dpoy_eval.predicted_dpoy_name} (#{dpoy_eval.predicted_dpoy_rank})"
+    )
+    lines.append(f"  Hit: {'✓ YES' if dpoy_eval.is_hit else '✗ NO'}")
+    lines.append(f"  Grade: {dpoy_eval.grade}")
+    lines.append(f"  Min Games Required: {dpoy_eval.min_games_required}")
+
+    if dpoy_eval.eligible_players_checked > 1:
+        lines.append(
+            f"  Note: Top {dpoy_eval.eligible_players_checked - 1} player(s) "
+            "were ineligible (games threshold)"
+        )
+
+    lines.append("")
+    return "\n".join(lines)
+
+
+def generate_benchmark_report(benchmarks: list[BenchmarkResult]) -> str:
+    """Generate report for EDI vs competitor benchmark.
+
+    Compares models on:
+    1. AvgRank - Average rank of All-Defense players (lower is better)
+    2. DPOY Rank - Where actual DPOY ranks in each model (lower is better)
+    """
+    if not benchmarks:
+        return ""
+
+    lines = []
+    lines.append("⚔️ EDI vs D-RAPTOR BENCHMARK")
+    lines.append("=" * 60)
+    lines.append("")
+    lines.append(
+        "Note: AvgRank = Average rank of All-Defense players (lower is better)"
+    )
+    lines.append("")
+
+    # Summary table
+    lines.append(
+        f"{'Season':<12} {'Metric':<15} {'EDI':<12} {'D-RAPTOR':<12} {'Winner':<10}"
+    )
+    lines.append("-" * 60)
+
+    for b in benchmarks:
+        # AvgRank comparison (lower is better)
+        lines.append(
+            f"{b.season:<12} {'AvgRank':<15} {b.edi_avg_rank:<12.1f} "
+            f"{b.competitor_avg_rank:<12.1f} {b.avg_rank_winner:<10}"
+        )
+
+        # DPOY rank comparison (lower is better)
+        edi_dpoy = f"#{b.edi_dpoy_rank}" if b.edi_dpoy_rank else "N/A"
+        raptor_dpoy = f"#{b.competitor_dpoy_rank}" if b.competitor_dpoy_rank else "N/A"
+        lines.append(
+            f"{'':12} {'DPOY Rank':<15} {edi_dpoy:<12} {raptor_dpoy:<12} {b.dpoy_winner:<10}"
+        )
+
+        # Overall winner
+        lines.append(f"{'':12} {'OVERALL':<15} {'':12} {'':12} {b.overall_winner:<10}")
+        lines.append("-" * 60)
+
+    # Aggregate winner
+    edi_wins = sum(1 for b in benchmarks if b.overall_winner == "EDI")
+    raptor_wins = sum(1 for b in benchmarks if b.overall_winner == "D-RAPTOR")
+    ties = sum(1 for b in benchmarks if b.overall_winner == "TIE")
+
+    lines.append("")
+    lines.append(f"Overall: EDI {edi_wins} - D-RAPTOR {raptor_wins} (Ties: {ties})")
+
+    if edi_wins > raptor_wins:
+        lines.append("🏅 EDI wins the benchmark!")
+    elif raptor_wins > edi_wins:
+        lines.append("🏅 D-RAPTOR wins the benchmark!")
+    else:
+        lines.append("🤝 It's a draw!")
+
+    lines.append("")
+    return "\n".join(lines)

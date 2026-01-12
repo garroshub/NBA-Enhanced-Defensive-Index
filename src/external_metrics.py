@@ -145,10 +145,13 @@ def normalize_name(name: str) -> str:
     return name.lower()
 
 
+@lru_cache(maxsize=10)
 def fetch_bref_advanced_stats(season: str) -> pd.DataFrame:
     """Fetch advanced stats from Basketball Reference.
 
     Includes DBPM (Defensive Box Plus/Minus) which is a good validation metric.
+
+    Note: Results are cached to avoid redundant network requests.
 
     Args:
         season: Season string (e.g., "2023-24")

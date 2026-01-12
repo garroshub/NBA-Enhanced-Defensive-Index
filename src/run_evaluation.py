@@ -24,6 +24,12 @@ from evaluation import (
     generate_multi_season_report,
     run_multi_season_evaluation,
     calculate_stability_metrics,
+    evaluate_dpoy_alignment,
+    benchmark_against_raptor,
+    generate_dpoy_report,
+    generate_benchmark_report,
+    DPOYEvaluation,
+    BenchmarkResult,
 )
 
 import pandas as pd
@@ -59,6 +65,12 @@ def evaluate_single_season(season: str, with_external: bool = False) -> None:
         eval_result = evaluate_season(df, season)
         report = generate_season_report(eval_result)
         print(report)
+
+        # DPOY alignment report
+        dpoy_eval = evaluate_dpoy_alignment(df, season)
+        dpoy_report = generate_dpoy_report(dpoy_eval)
+        print(dpoy_report)
+
     except ValueError as e:
         print(f"Error: {e}")
         return
@@ -67,10 +79,36 @@ def evaluate_single_season(season: str, with_external: bool = False) -> None:
     if with_external:
         print()
         try:
-            from external_metrics import generate_external_validation_report
+            from external_metrics import (
+                generate_external_validation_report,
+                fetch_raptor_data,
+            )
 
             ext_report = generate_external_validation_report(df, season)
             print(ext_report)
+
+            # EDI vs D-RAPTOR benchmark (for seasons with RAPTOR data)
+            # Note: fetch_raptor_data returns ALL seasons, need to filter
+            all_raptor_df = fetch_raptor_data()
+            if all_raptor_df is not None and not all_raptor_df.empty:
+                # Convert season string to year (e.g., "2021-22" -> 2022)
+                season_year = int(season.split("-")[0]) + 1
+                raptor_df = pd.DataFrame(
+                    all_raptor_df[all_raptor_df["season"] == season_year]
+                )
+
+                if not raptor_df.empty:
+                    benchmark = benchmark_against_raptor(
+                        df,
+                        season,
+                        raptor_df,
+                        raptor_score_col="raptor_defense",
+                        raptor_name_col="player_name",
+                    )
+                    if benchmark:
+                        benchmark_report = generate_benchmark_report([benchmark])
+                        print(benchmark_report)
+
         except ImportError:
             print("External metrics module not available")
         except Exception as e:
@@ -102,25 +140,101 @@ def evaluate_all_seasons(with_external: bool = False) -> None:
     report = generate_multi_season_report(results, stability)
     print(report)
 
-    # External validation summary (if requested)
-    if with_external and results:
+    # DPOY Alignment Summary
+    print("=" * 70)
+    print("🏆 DPOY ALIGNMENT SUMMARY")
+    print("=" * 70)
+    print()
+    print(f"{'Season':<12} {'Actual DPOY':<25} {'EDI Rank':<12} {'Grade':<8}")
+    print("-" * 60)
+
+    dpoy_evals: list[DPOYEvaluation] = []
+    for season in ALL_SEASONS:
+        csv_path = DATA_DIR / f"nba_defensive_all_players_{season}.csv"
+        if not csv_path.exists():
+            continue
+
+        df = pd.read_csv(csv_path)
+        dpoy_eval = evaluate_dpoy_alignment(df, season)
+        dpoy_evals.append(dpoy_eval)
+
+        dpoy_name = dpoy_eval.actual_dpoy_name or "N/A"
+        dpoy_rank = (
+            f"#{dpoy_eval.actual_dpoy_rank}" if dpoy_eval.actual_dpoy_rank else "N/A"
+        )
+        hit_mark = " ✓" if dpoy_eval.is_hit else ""
+        print(
+            f"{season:<12} {dpoy_name:<25} {dpoy_rank:<12} {dpoy_eval.grade:<8}{hit_mark}"
+        )
+
+    # DPOY Summary stats
+    ranks = [d.actual_dpoy_rank for d in dpoy_evals if d.actual_dpoy_rank is not None]
+    hits = sum(1 for d in dpoy_evals if d.is_hit)
+    if ranks:
+        print("-" * 60)
+        print(
+            f"{'Average':<12} {'':<25} {'#' + str(round(sum(ranks) / len(ranks), 1)):<12}"
+        )
+        print(f"{'Hits':<12} {'':<25} {f'{hits}/{len(dpoy_evals)}':<12}")
+    print()
+
+    # EDI vs D-RAPTOR Benchmark (for seasons with RAPTOR data)
+    if with_external:
         print()
         print("=" * 70)
-        print("EXTERNAL VALIDATION SUMMARY")
+        print("⚔️ EDI vs D-RAPTOR BENCHMARK")
         print("=" * 70)
+        print()
+        print("Note: RAPTOR data available for 2019-20 to 2021-22 only")
         print()
 
         try:
             from external_metrics import (
                 merge_external_metrics,
                 calculate_external_correlation,
+                fetch_raptor_data,
             )
 
-            # Only for seasons with RAPTOR data (2019-20 to 2021-22)
             raptor_seasons = ["2019-20", "2020-21", "2021-22"]
+            benchmarks: list[BenchmarkResult] = []
 
-            print("Note: RAPTOR data available for 2019-20 to 2021-22 only")
-            print()
+            # Fetch all RAPTOR data once (cached)
+            all_raptor_df = fetch_raptor_data()
+
+            for season in raptor_seasons:
+                csv_path = DATA_DIR / f"nba_defensive_all_players_{season}.csv"
+                if not csv_path.exists():
+                    continue
+
+                df = pd.read_csv(csv_path)
+
+                # Filter RAPTOR data for this season
+                if all_raptor_df is not None and not all_raptor_df.empty:
+                    season_year = int(season.split("-")[0]) + 1
+                    raptor_df = pd.DataFrame(
+                        all_raptor_df[all_raptor_df["season"] == season_year]
+                    )
+
+                    if not raptor_df.empty:
+                        benchmark = benchmark_against_raptor(
+                            df,
+                            season,
+                            raptor_df,
+                            raptor_score_col="raptor_defense",
+                            raptor_name_col="player_name",
+                        )
+                        if benchmark:
+                            benchmarks.append(benchmark)
+
+            if benchmarks:
+                benchmark_report = generate_benchmark_report(benchmarks)
+                print(benchmark_report)
+            else:
+                print("No benchmark data available (RAPTOR data fetch failed)")
+
+            # Also show correlation summary
+            print("-" * 70)
+            print("External Correlation Summary:")
             print(f"{'Season':<12} {'D-RAPTOR Corr':<15} {'N Players':<12}")
             print("-" * 40)
 
@@ -179,25 +293,29 @@ def show_help():
     """Show usage help."""
     print("Evaluates EDI model against NBA All-Defensive Team selections")
     print()
-    print("Three-Dimensional Evaluation:")
+    print("Evaluation Dimensions:")
     print("  1. Tier Alignment - Average rank of All-Defense players in model")
     print("  2. Candidate Pool Quality - Recall@K metrics (K=10,15,20,30)")
     print("  3. Miss Analysis - Categorizes misses by severity")
+    print("  4. DPOY Alignment - How well model predicts Defensive Player of Year")
+    print("  5. Benchmark (with --external) - EDI vs D-RAPTOR head-to-head")
     print()
     print("Usage:")
     print("  python src/run_evaluation.py <season>       # Single season")
     print("  python src/run_evaluation.py --all          # All 5 seasons")
     print(
-        "  python src/run_evaluation.py --external <season>  # With D-RAPTOR validation"
+        "  python src/run_evaluation.py --external <season>  # With D-RAPTOR benchmark"
     )
-    print("  python src/run_evaluation.py --all --external     # All with validation")
+    print("  python src/run_evaluation.py --all --external     # All with benchmark")
     print()
     print("Examples:")
     print("  python src/run_evaluation.py 2023-24")
     print("  python src/run_evaluation.py --all")
     print("  python src/run_evaluation.py --external 2021-22")
     print()
-    print("Note: External validation (D-RAPTOR) available for 2019-20 to 2021-22")
+    print(
+        "Note: D-RAPTOR data available for 2019-20 to 2021-22 (FiveThirtyEight discontinued)"
+    )
 
 
 if __name__ == "__main__":
