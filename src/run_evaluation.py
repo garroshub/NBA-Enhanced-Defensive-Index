@@ -1,178 +1,203 @@
 #!/usr/bin/env python
-"""Run EDI model evaluation against ground truth data.
+"""Run EDI model evaluation against All-Defensive Team ground truth.
 
 Usage:
-    python src/run_evaluation.py                    # Default: 2023-24 season
+    python src/run_evaluation.py                    # Default: show help
     python src/run_evaluation.py 2022-23            # Specific season
-    python src/run_evaluation.py --all              # All available seasons
+    python src/run_evaluation.py --all              # 5 seasons (2019-20 to 2023-24)
+    python src/run_evaluation.py --external 2021-22 # With external validation
 """
 
+import io
 import sys
 from pathlib import Path
 
-import pandas as pd
+# Set UTF-8 encoding for stdout
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-from data_fetcher import get_all_defensive_teams, get_all_defensive_player_ids
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from evaluation import (
-    calculate_coverage,
-    calculate_correlations,
-    generate_evaluation_report,
+    evaluate_season,
+    generate_season_report,
+    generate_multi_season_report,
+    run_multi_season_evaluation,
+    calculate_stability_metrics,
 )
+
+import pandas as pd
 
 # Project paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 
-# Reference columns for correlation analysis
-# DEF_RATING: lower is better (points allowed per 100 possessions)
-# Other stats: higher is better
-CORRELATION_COLS = [
-    "D1_Score",
-    "D2_Score",
-    "D3_Score",
-    "D4_Score",
-    "D5_Score",
-    "Efficiency",
-]
+# Default seasons for --all flag
+ALL_SEASONS = ["2019-20", "2020-21", "2021-22", "2022-23", "2023-24"]
 
 
-def load_model_output(season: str) -> pd.DataFrame:
-    """Load EDI model output for a season.
+def evaluate_single_season(season: str, with_external: bool = False) -> None:
+    """Run evaluation for a single season and print report.
 
     Args:
         season: Season string (e.g., "2023-24")
-
-    Returns:
-        DataFrame with model predictions.
+        with_external: Whether to include external metric validation
     """
-    filepath = DATA_DIR / f"nba_defensive_all_players_{season}.csv"
-    if not filepath.exists():
-        print(f"Warning: Model output not found: {filepath}")
-        return pd.DataFrame()
+    csv_path = DATA_DIR / f"nba_defensive_all_players_{season}.csv"
 
-    return pd.read_csv(filepath)
+    if not csv_path.exists():
+        print(f"Error: Data file not found: {csv_path}")
+        print(f"Run 'python src/nba_defense_mvp.py {season}' first to generate data.")
+        return
+
+    df = pd.read_csv(csv_path)
+    print(f"Loaded {len(df)} players from {csv_path.name}")
+    print()
+
+    # Run evaluation
+    try:
+        eval_result = evaluate_season(df, season)
+        report = generate_season_report(eval_result)
+        print(report)
+    except ValueError as e:
+        print(f"Error: {e}")
+        return
+
+    # External validation (if requested and available)
+    if with_external:
+        print()
+        try:
+            from external_metrics import generate_external_validation_report
+
+            ext_report = generate_external_validation_report(df, season)
+            print(ext_report)
+        except ImportError:
+            print("External metrics module not available")
+        except Exception as e:
+            print(f"External validation error: {e}")
 
 
-def add_ground_truth_labels(df: pd.DataFrame, season: str) -> pd.DataFrame:
-    """Add Is_All_Defense column based on ground truth.
+def evaluate_all_seasons(with_external: bool = False) -> None:
+    """Run evaluation for all 5 seasons and print comprehensive report."""
+    print("Running 5-season evaluation...")
+    print(f"Seasons: {', '.join(ALL_SEASONS)}")
+    print()
 
-    Args:
-        df: DataFrame with PLAYER_ID column
-        season: Season string
+    # Check which data files exist
+    missing = []
+    for season in ALL_SEASONS:
+        csv_path = DATA_DIR / f"nba_defensive_all_players_{season}.csv"
+        if not csv_path.exists():
+            missing.append(season)
 
-    Returns:
-        DataFrame with Is_All_Defense column added.
-    """
-    all_defense_ids = get_all_defensive_player_ids(season)
-    df = df.copy()
-    df["Is_All_Defense"] = df["PLAYER_ID"].isin(all_defense_ids).astype(int)
-    return df
+    if missing:
+        print(f"Warning: Missing data for seasons: {', '.join(missing)}")
+        print("Run 'python src/nba_defense_mvp.py <season>' to generate missing data.")
+        print()
 
+    # Run evaluation
+    results, stability = run_multi_season_evaluation(ALL_SEASONS, str(DATA_DIR))
 
-def evaluate_season(season: str) -> dict:
-    """Run full evaluation for a single season.
-
-    Args:
-        season: Season string (e.g., "2023-24")
-
-    Returns:
-        Dictionary with evaluation results.
-    """
-    print(f"\nEvaluating season: {season}")
-    print("-" * 40)
-
-    # Load model output
-    df = load_model_output(season)
-    if df.empty:
-        print(f"  No data available for {season}")
-        return {}
-
-    # Add ground truth labels
-    df = add_ground_truth_labels(df, season)
-
-    # Check if we have ground truth for this season
-    ground_truth = get_all_defensive_teams(season)
-    if ground_truth.empty:
-        print(f"  No ground truth available for {season}")
-        return {}
-
-    print(f"  Loaded {len(df)} players, {df['Is_All_Defense'].sum()} All-Defense")
-
-    # Layer 1: Coverage analysis
-    coverage_10 = calculate_coverage(df, top_n=10)
-    coverage_15 = calculate_coverage(df, top_n=15)
-    coverage_20 = calculate_coverage(df, top_n=20)
-
-    # Layer 2: Correlation analysis
-    available_cols = [c for c in CORRELATION_COLS if c in df.columns]
-    correlations = calculate_correlations(df, "EDI_Total", available_cols)
-
-    # Generate report
-    report = generate_evaluation_report(coverage_10, correlations, season)
+    # Print report
+    report = generate_multi_season_report(results, stability)
     print(report)
 
-    # Additional coverage at different thresholds
-    print("\n## Coverage at Different Thresholds")
-    print("-" * 40)
-    print(f"Top 10: Precision={coverage_10['precision@10']:.1%}, Recall={coverage_10['recall@10']:.1%}")
-    print(f"Top 15: Precision={coverage_15['precision@15']:.1%}, Recall={coverage_15['recall@15']:.1%}")
-    print(f"Top 20: Precision={coverage_20['precision@20']:.1%}, Recall={coverage_20['recall@20']:.1%}")
+    # External validation summary (if requested)
+    if with_external and results:
+        print()
+        print("=" * 70)
+        print("EXTERNAL VALIDATION SUMMARY")
+        print("=" * 70)
+        print()
 
-    # Show which All-Defense players we found/missed
-    print("\n## All-Defensive Team Analysis")
-    print("-" * 40)
-    
-    all_defense_df = df[df["Is_All_Defense"] == 1].sort_values("EDI_Total", ascending=False)
-    print("Found All-Defensive players and their EDI ranks:")
-    
-    df_sorted = df.sort_values("EDI_Total", ascending=False).reset_index(drop=True)
-    df_sorted["Rank"] = df_sorted.index + 1
-    
-    for _, row in all_defense_df.iterrows():
-        player_rank = df_sorted[df_sorted["PLAYER_ID"] == row["PLAYER_ID"]]["Rank"].values
-        if len(player_rank) > 0:
-            print(f"  #{player_rank[0]:3d}: {row['PLAYER_NAME']:<25} EDI={row['EDI_Total']:.1f}")
+        try:
+            from external_metrics import (
+                merge_external_metrics,
+                calculate_external_correlation,
+            )
 
-    return {
-        "season": season,
-        "coverage_10": coverage_10,
-        "coverage_15": coverage_15,
-        "coverage_20": coverage_20,
-        "correlations": correlations,
-    }
+            # Only for seasons with RAPTOR data (2019-20 to 2021-22)
+            raptor_seasons = ["2019-20", "2020-21", "2021-22"]
+
+            print("Note: RAPTOR data available for 2019-20 to 2021-22 only")
+            print()
+            print(f"{'Season':<12} {'D-RAPTOR Corr':<15} {'N Players':<12}")
+            print("-" * 40)
+
+            for season in raptor_seasons:
+                csv_path = DATA_DIR / f"nba_defensive_all_players_{season}.csv"
+                if not csv_path.exists():
+                    continue
+
+                df = pd.read_csv(csv_path)
+                merged = merge_external_metrics(df, season)
+                corr = calculate_external_correlation(merged)
+
+                if "D_RAPTOR" in corr and "error" not in corr["D_RAPTOR"]:
+                    r = corr["D_RAPTOR"]["spearman"]
+                    n = corr["D_RAPTOR"]["n_players"]
+                    print(f"{season:<12} {r:<15.3f} {n:<12}")
+                else:
+                    print(f"{season:<12} {'N/A':<15} {'-':<12}")
+
+        except ImportError:
+            print("External metrics module not available")
+        except Exception as e:
+            print(f"External validation error: {e}")
 
 
 def main():
     """Main entry point."""
+    print("=" * 70)
+    print("EDI Model Three-Dimensional Evaluation")
+    print("=" * 70)
+    print()
+
     # Parse arguments
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--all":
-            seasons = ["2023-24", "2022-23", "2021-22"]
+        arg = sys.argv[1]
+        with_external = "--external" in sys.argv
+
+        if arg == "--all":
+            evaluate_all_seasons(with_external)
+        elif arg == "--external":
+            # If --external is first arg, check for season
+            if len(sys.argv) > 2 and sys.argv[2] != "--all":
+                evaluate_single_season(sys.argv[2], with_external=True)
+            else:
+                evaluate_all_seasons(with_external=True)
+        elif arg == "--help" or arg == "-h":
+            show_help()
         else:
-            seasons = [sys.argv[1]]
+            evaluate_single_season(arg, with_external)
     else:
-        seasons = ["2023-24"]
+        # Default: show help
+        show_help()
 
-    print("=" * 60)
-    print("EDI Model Evaluation")
-    print("=" * 60)
 
-    all_results = []
-    for season in seasons:
-        result = evaluate_season(season)
-        if result:
-            all_results.append(result)
-
-    # Summary across seasons
-    if len(all_results) > 1:
-        print("\n" + "=" * 60)
-        print("Summary Across Seasons")
-        print("=" * 60)
-        for r in all_results:
-            s = r["season"]
-            p10 = r["coverage_10"]["precision@10"]
-            r10 = r["coverage_10"]["recall@10"]
-            print(f"{s}: Precision@10={p10:.1%}, Recall@10={r10:.1%}")
+def show_help():
+    """Show usage help."""
+    print("Evaluates EDI model against NBA All-Defensive Team selections")
+    print()
+    print("Three-Dimensional Evaluation:")
+    print("  1. Tier Alignment - Average rank of All-Defense players in model")
+    print("  2. Candidate Pool Quality - Recall@K metrics (K=10,15,20,30)")
+    print("  3. Miss Analysis - Categorizes misses by severity")
+    print()
+    print("Usage:")
+    print("  python src/run_evaluation.py <season>       # Single season")
+    print("  python src/run_evaluation.py --all          # All 5 seasons")
+    print(
+        "  python src/run_evaluation.py --external <season>  # With D-RAPTOR validation"
+    )
+    print("  python src/run_evaluation.py --all --external     # All with validation")
+    print()
+    print("Examples:")
+    print("  python src/run_evaluation.py 2023-24")
+    print("  python src/run_evaluation.py --all")
+    print("  python src/run_evaluation.py --external 2021-22")
+    print()
+    print("Note: External validation (D-RAPTOR) available for 2019-20 to 2021-22")
 
 
 if __name__ == "__main__":

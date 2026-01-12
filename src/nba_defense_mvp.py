@@ -434,9 +434,12 @@ def analyze_season(target_season):
         base_df.loc[base_df["D_FGA"] < 5, "D_FG_PCT"] = np.nan
         base_df.loc[base_df["D_FGA"] < 5, "PCT_PLUSMINUS"] = np.nan
 
-        MD_K = 0.3  # MD adjustment coefficient
-        base_df["PCT_PLUSMINUS_ADJ"] = base_df["PCT_PLUSMINUS"] * (
-            1 + MD_K * base_df["MD_Zscore"]
+        # MD adjustment: subtract expected impact from PLUSMINUS
+        # Higher MD (defending better scorers) allows higher PLUSMINUS
+        # Each +1 std MD allows +1.5% higher opponent FG%
+        MD_K = 0.015  # MD adjustment coefficient (1.5% per std)
+        base_df["PCT_PLUSMINUS_ADJ"] = base_df["PCT_PLUSMINUS"] - (
+            MD_K * base_df["MD_Zscore"]
         )
 
         # Use adjusted PCT_PLUSMINUS for ranking
@@ -458,7 +461,8 @@ def analyze_season(target_season):
         base_df["W1"] = 0.0
 
     # --- D2: Shot Profile (Rim + 3PT) - Value Added + MD Adjustment ---
-    MD_K = 0.3  # MD adjustment coefficient (same as D1)
+    # MD adjustment: subtract expected impact (same logic as D1)
+    MD_K = 0.015  # MD adjustment coefficient (1.5% per std)
 
     # Rim (护筐) - 使用 PLUSMINUS + MD调整
     if (
@@ -474,9 +478,9 @@ def analyze_season(target_season):
             }
         )
         base_df = base_df.merge(d2_rim, on="PLAYER_ID", how="left")
-        # MD Adjustment for Rim
-        base_df["Rim_PLUSMINUS_ADJ"] = base_df["Rim_PLUSMINUS"] * (
-            1 + MD_K * base_df["MD_Zscore"]
+        # MD Adjustment for Rim: subtract expected impact
+        base_df["Rim_PLUSMINUS_ADJ"] = base_df["Rim_PLUSMINUS"] - (
+            MD_K * base_df["MD_Zscore"]
         )
         # Value Added: PLUSMINUS 越负越好 (使用调整后的值)
         base_df["Rim_Raw"] = 1 - base_df["Rim_PLUSMINUS_ADJ"].rank(pct=True)
@@ -505,9 +509,9 @@ def analyze_season(target_season):
             }
         )
         base_df = base_df.merge(d2_3pt, on="PLAYER_ID", how="left")
-        # MD Adjustment for 3PT
-        base_df["3PT_PLUSMINUS_ADJ"] = base_df["3PT_PLUSMINUS"] * (
-            1 + MD_K * base_df["MD_Zscore"]
+        # MD Adjustment for 3PT: subtract expected impact
+        base_df["3PT_PLUSMINUS_ADJ"] = base_df["3PT_PLUSMINUS"] - (
+            MD_K * base_df["MD_Zscore"]
         )
         # Value Added: PLUSMINUS 越负越好 (使用调整后的值)
         base_df["3PT_Raw"] = 1 - base_df["3PT_PLUSMINUS_ADJ"].rank(pct=True)
