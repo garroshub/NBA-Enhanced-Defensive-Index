@@ -140,13 +140,15 @@ def evaluate_all_seasons(with_external: bool = False) -> None:
     report = generate_multi_season_report(results, stability)
     print(report)
 
-    # DPOY Alignment Summary
+    # DPOY Alignment Summary (Position-Relative Ranking)
     print("=" * 70)
-    print("🏆 DPOY ALIGNMENT SUMMARY")
+    print("🏆 DPOY ALIGNMENT SUMMARY (Position-Relative)")
     print("=" * 70)
     print()
-    print(f"{'Season':<12} {'Actual DPOY':<25} {'EDI Rank':<12} {'Grade':<8}")
-    print("-" * 60)
+    print(
+        f"{'Season':<12} {'Actual DPOY':<22} {'Pos Rank':<12} {'Position':<8} {'Grade':<8}"
+    )
+    print("-" * 65)
 
     dpoy_evals: list[DPOYEvaluation] = []
     for season in ALL_SEASONS:
@@ -159,23 +161,31 @@ def evaluate_all_seasons(with_external: bool = False) -> None:
         dpoy_evals.append(dpoy_eval)
 
         dpoy_name = dpoy_eval.actual_dpoy_name or "N/A"
-        dpoy_rank = (
-            f"#{dpoy_eval.actual_dpoy_rank}" if dpoy_eval.actual_dpoy_rank else "N/A"
+        # 显示位置排名而非全联盟排名
+        pos_rank = (
+            f"#{dpoy_eval.actual_dpoy_position_rank}"
+            if dpoy_eval.actual_dpoy_position_rank
+            else "N/A"
         )
-        hit_mark = " ✓" if dpoy_eval.is_hit else ""
+        position = dpoy_eval.actual_dpoy_position or "?"
+        # 位置排名 #1 = 命中
+        hit_mark = " ✓" if dpoy_eval.is_position_hit else ""
         print(
-            f"{season:<12} {dpoy_name:<25} {dpoy_rank:<12} {dpoy_eval.grade:<8}{hit_mark}"
+            f"{season:<12} {dpoy_name:<22} {pos_rank:<12} {position:<8} {dpoy_eval.grade:<8}{hit_mark}"
         )
 
-    # DPOY Summary stats
-    ranks = [d.actual_dpoy_rank for d in dpoy_evals if d.actual_dpoy_rank is not None]
-    hits = sum(1 for d in dpoy_evals if d.is_hit)
-    if ranks:
-        print("-" * 60)
-        print(
-            f"{'Average':<12} {'':<25} {'#' + str(round(sum(ranks) / len(ranks), 1)):<12}"
-        )
-        print(f"{'Hits':<12} {'':<25} {f'{hits}/{len(dpoy_evals)}':<12}")
+    # DPOY Summary stats (using position ranks)
+    pos_ranks = [
+        d.actual_dpoy_position_rank
+        for d in dpoy_evals
+        if d.actual_dpoy_position_rank is not None
+    ]
+    pos_hits = sum(1 for d in dpoy_evals if d.is_position_hit)
+    if pos_ranks:
+        print("-" * 65)
+        avg_pos_rank = sum(pos_ranks) / len(pos_ranks)
+        print(f"{'Average':<12} {'':<22} {'#' + str(round(avg_pos_rank, 1)):<12}")
+        print(f"{'Pos #1 Hits':<12} {'':<22} {f'{pos_hits}/{len(dpoy_evals)}':<12}")
     print()
 
     # EDI vs D-RAPTOR Benchmark (for seasons with RAPTOR data)

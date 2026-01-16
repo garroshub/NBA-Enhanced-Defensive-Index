@@ -58,14 +58,18 @@ TEST_SEASON = "2024-25"
 
 # Current baseline parameters (from nba_defense_mvp.py)
 BASELINE_PARAMS = {
-    "guard_d2_ext": 0.6,
-    "guard_d2_int": 0.4,
-    "front_d2_ext": 0.4,
-    "front_d2_int": 0.6,
-    "guard_d5_impact": 0.5,
+    "guard_d2_ext": 0.65,
+    "guard_d2_int": 0.35,
+    "front_d2_ext": 0.45,
+    "front_d2_int": 0.55,
+    "guard_d5_impact": 0.4,
     "front_d5_impact": 1.0,
-    "bayes_c": 50,
-    "md_k": 0.015,
+    "bayes_c": 60,
+    "md_k": 0.018,
+    "sigmoid_g0": 45,  # Sigmoid midpoint
+    "sigmoid_k": 0.15,  # Sigmoid steepness (fixed)
+    "roamer_k": 0.3,  # Roamer D5 weight adjustment coefficient
+    "d2_ext_roamer_k": 0.5,  # Roamer D2 exterior weight adjustment coefficient
 }
 
 # Search space with basketball-logical constraints
@@ -77,6 +81,9 @@ SEARCH_SPACE = {
     "guard_d5_impact": [0.4, 0.5, 0.6],
     "bayes_c": [35, 45, 55, 65],
     "md_k": [0.010, 0.015, 0.020],
+    "sigmoid_g0": [45, 50, 55, 60],  # Sigmoid midpoint (games threshold)
+    "roamer_k": [0.2, 0.3, 0.4],  # Roamer D5 adjustment coefficient
+    "d2_ext_roamer_k": [0.4, 0.5, 0.6],  # Roamer D2 exterior adjustment
 }
 
 QUICK_SEARCH_SPACE = {
@@ -85,6 +92,9 @@ QUICK_SEARCH_SPACE = {
     "guard_d5_impact": [0.4, 0.6],
     "bayes_c": [40, 60],
     "md_k": [0.012, 0.018],
+    "sigmoid_g0": [45, 55],  # Sigmoid midpoint
+    "roamer_k": [0.2, 0.3, 0.4],  # Roamer D5 adjustment coefficient
+    "d2_ext_roamer_k": [0.4, 0.5, 0.6],  # Roamer D2 exterior adjustment
 }
 
 
@@ -100,6 +110,12 @@ class ParameterSet:
     front_d5_impact: float  # Always 1.0 (frontcourt full rebound credit)
     bayes_c: int
     md_k: float
+    # Sigmoid availability parameters
+    sigmoid_g0: int  # Sigmoid midpoint (games played threshold)
+    sigmoid_k: float  # Sigmoid steepness
+    # Roamer dynamic weight adjustment
+    roamer_k: float  # Coefficient for Roamer W5 reduction (0-1)
+    d2_ext_roamer_k: float  # Coefficient for Roamer D2 exterior weight reduction
 
     @classmethod
     def from_search(
@@ -109,6 +125,10 @@ class ParameterSet:
         guard_d5_impact: float,
         bayes_c: int,
         md_k: float,
+        sigmoid_g0: int = 50,
+        sigmoid_k: float = 0.15,
+        roamer_k: float = 0.3,
+        d2_ext_roamer_k: float = 0.5,
     ) -> "ParameterSet":
         """Create from search space (derives complementary weights)."""
         return cls(
@@ -120,6 +140,10 @@ class ParameterSet:
             front_d5_impact=1.0,
             bayes_c=bayes_c,
             md_k=md_k,
+            sigmoid_g0=sigmoid_g0,
+            sigmoid_k=sigmoid_k,
+            roamer_k=roamer_k,
+            d2_ext_roamer_k=d2_ext_roamer_k,
         )
 
 
@@ -129,12 +153,16 @@ class EvaluationResult:
 
     season: str
     avg_rank: float
+    pos_adj_avg_rank: float  # Position-adjusted average rank
     recall_at_10: float
     recall_at_20: float
     blind_spots: int
     d_raptor_corr: float | None
     dbpm_corr: float | None
-    dpoy_rank: int | None  # Where actual DPOY ranks in model
+    dpoy_rank: int | None  # Where actual DPOY ranks in model (global)
+    dpoy_position_rank: (
+        int | None
+    )  # DPOY's rank in their position pool (best of all eligible positions)
     dpoy_hit: bool  # Model's top eligible player is DPOY?
 
 
@@ -170,6 +198,25 @@ def bayesian_score(raw_pct: float, n: float, c: int = 50) -> tuple[float, float]
     return shrunk, weight
 
 
+def sigmoid_availability(games: float, g0: int = 50, k: float = 0.15) -> float:
+    """Calculate availability factor using sigmoid function.
+
+    This replaces linear accumulation with diminishing returns:
+    - Below g0: Rapidly increases (proving availability)
+    - At g0: Returns 0.5 (threshold)
+    - Above g0: Approaches 1.0 asymptotically (no extra credit for iron man)
+
+    Args:
+        games: Games played
+        g0: Sigmoid midpoint (default 50 games)
+        k: Steepness factor (default 0.15)
+
+    Returns:
+        Availability factor between 0 and 1
+    """
+    return 1.0 / (1.0 + np.exp(-k * (games - g0)))
+
+
 def recalculate_edi_scores(
     df: pd.DataFrame,
     params: ParameterSet,
@@ -178,6 +225,9 @@ def recalculate_edi_scores(
 
     This is the fast in-memory recalculation that doesn't require API calls.
     Uses pre-computed raw metrics from the CSV files.
+
+    Now includes Sigmoid availability adjustment:
+    EDI_Sigmoid = Efficiency * Sigmoid(GP)
 
     Args:
         df: DataFrame with raw EDI component data
@@ -231,14 +281,30 @@ def recalculate_edi_scores(
         rim_raw = df["Rim_Raw"].fillna(0.5)
         pt3_raw = df["3PT_Raw"].fillna(0.5)
 
+        # Calculate Roamer_Pct for D2 exterior weight adjustment
+        if "BLK" in df.columns and "MIN" in df.columns and "DREB_PCT" in df.columns:
+            df["BLK_per_36"] = df["BLK"] / df["MIN"].replace(0, 1) * 36
+            df["Roamer_Index"] = df["BLK_per_36"] / (df["DREB_PCT"] + 0.01)
+            frontcourt_mask = df["ROLE"] == "Frontcourt"
+            df.loc[frontcourt_mask, "Roamer_Pct"] = df.loc[
+                frontcourt_mask, "Roamer_Index"
+            ].rank(pct=True)
+            df["Roamer_Pct"] = df["Roamer_Pct"].fillna(0)
+
         def calc_d2_raw(row):
             if row["ROLE"] == "Guards":
                 return (rim_raw[row.name] * params.guard_d2_int) + (
                     pt3_raw[row.name] * params.guard_d2_ext
                 )
             else:
-                return (rim_raw[row.name] * params.front_d2_int) + (
-                    pt3_raw[row.name] * params.front_d2_ext
+                # Roamer dynamic exterior weight adjustment
+                roamer_pct = row.get("Roamer_Pct", 0)
+                adjusted_ext = params.front_d2_ext * (
+                    1 - params.d2_ext_roamer_k * roamer_pct
+                )
+                adjusted_int = 1 - adjusted_ext
+                return (rim_raw[row.name] * adjusted_int) + (
+                    pt3_raw[row.name] * adjusted_ext
                 )
 
         df["D2_Raw"] = df.apply(calc_d2_raw, axis=1)
@@ -253,8 +319,14 @@ def recalculate_edi_scores(
                     fg3_fga[row.name] * params.guard_d2_ext
                 )
             else:
-                return (rim_fga[row.name] * params.front_d2_int) + (
-                    fg3_fga[row.name] * params.front_d2_ext
+                # Roamer dynamic exterior weight adjustment
+                roamer_pct = row.get("Roamer_Pct", 0)
+                adjusted_ext = params.front_d2_ext * (
+                    1 - params.d2_ext_roamer_k * roamer_pct
+                )
+                adjusted_int = 1 - adjusted_ext
+                return (rim_fga[row.name] * adjusted_int) + (
+                    fg3_fga[row.name] * adjusted_ext
                 )
 
         df["D2_N"] = df.apply(calc_d2_n, axis=1)
@@ -312,6 +384,12 @@ def recalculate_edi_scores(
             axis=1,
         )
 
+        # --- Roamer dynamic D5 weight adjustment ---
+        # Roamer_Pct was calculated in D2 section above
+        # Apply dynamic adjustment: W5 = W5 * (1 - roamer_k * Roamer_Pct)
+        if "Roamer_Pct" in df.columns:
+            df["W5"] = df["W5"] * (1 - params.roamer_k * df["Roamer_Pct"])
+
     # Fill NaN scores with 0.5
     score_cols = ["D1_Score", "D2_Score", "D3_Score", "D4_Score", "D5_Score"]
     weight_cols = ["W1", "W2", "W3", "W4", "W5"]
@@ -333,8 +411,20 @@ def recalculate_edi_scores(
     df["Expected_Output"] = df["Input_Score"] * 0.5
     df["Efficiency"] = df["Actual_Output"] / df["Expected_Output"].replace(0, 1)
 
-    # Final EDI score (efficiency-weighted)
-    df["EDI_Total"] = df["Actual_Output"] * df["Efficiency"].clip(lower=0.5, upper=1.5)
+    # Apply Sigmoid availability adjustment
+    # This replaces linear accumulation with diminishing returns
+    df["Sigmoid_Factor"] = df["GP"].apply(
+        lambda g: sigmoid_availability(g, params.sigmoid_g0, params.sigmoid_k)
+    )
+
+    # Final EDI score: Blend of volume and efficiency
+    # Formula: (Actual_Output * Efficiency) * Sigmoid(GP)
+    # - Actual_Output: Raw weighted contribution (rewards volume)
+    # - Efficiency: Quality multiplier (rewards quality over quantity)
+    # - Sigmoid: Availability gate (prevents low-GP outliers, caps iron-man bonus)
+    df["EDI_Total"] = (
+        df["Actual_Output"] * df["Efficiency"].clip(lower=0.5, upper=1.5)
+    ) * df["Sigmoid_Factor"]
 
     return df
 
@@ -365,25 +455,28 @@ def evaluate_params_on_season(
         return EvaluationResult(
             season=season,
             avg_rank=999,
+            pos_adj_avg_rank=999,
             recall_at_10=0,
             recall_at_20=0,
             blind_spots=10,
             d_raptor_corr=None,
             dbpm_corr=None,
             dpoy_rank=None,
+            dpoy_position_rank=None,
             dpoy_hit=False,
         )
 
     gt_names = set(gt["PLAYER_NAME"])
 
-    # Calculate metrics
-    tier = calculate_tier_alignment(recalc_df, gt_names)
+    # Calculate metrics (传入 ground_truth_df 以支持位置排名)
+    tier = calculate_tier_alignment(recalc_df, gt_names, ground_truth_df=gt)
     pool = calculate_candidate_pool_quality(recalc_df, gt_names)
     miss = calculate_miss_analysis(recalc_df, gt_names)
 
-    # DPOY alignment
+    # DPOY alignment (now includes position rank)
     dpoy_eval = evaluate_dpoy_alignment(recalc_df, season)
     dpoy_rank = dpoy_eval.actual_dpoy_rank
+    dpoy_position_rank = dpoy_eval.actual_dpoy_position_rank
     dpoy_hit = dpoy_eval.is_hit
 
     # External correlations (optional, slower)
@@ -400,12 +493,14 @@ def evaluate_params_on_season(
     return EvaluationResult(
         season=season,
         avg_rank=tier.avg_rank,
+        pos_adj_avg_rank=tier.pos_adj_avg_rank,
         recall_at_10=pool.recall_at_10,
         recall_at_20=pool.recall_at_20,
         blind_spots=len(miss.blind_spots),
         d_raptor_corr=d_raptor_corr,
         dbpm_corr=dbpm_corr,
         dpoy_rank=dpoy_rank,
+        dpoy_position_rank=dpoy_position_rank,
         dpoy_hit=dpoy_hit,
     )
 
@@ -416,15 +511,20 @@ def calculate_objective_score(
 ) -> float:
     """Calculate optimization objective from evaluation results.
 
-    Objective: MINIMIZE total ranking error
+    Objective: MINIMIZE total ranking error using POSITION-RELATIVE rankings.
 
-    Loss = AvgRank(All-Defense) + Σ(DPOY_Rank - 1)
-
-    We return negative loss so higher = better (for sorting).
+    New Loss Formula:
+        Loss = Avg_Pos_Rank_AllDefense + (DPOY_Pos_Rank - 1)
 
     Where:
-    - AvgRank: Average rank of All-Defense players in EDI (lower is better)
-    - DPOY_Rank - 1: Gap between DPOY's rank and #1 (0 if DPOY is #1)
+    - Avg_Pos_Rank_AllDefense: Average position-adjusted rank of All-Defense players
+    - DPOY_Pos_Rank - 1: Gap between DPOY's position rank and #1 (0 if DPOY is #1 in position)
+
+    Both components use position-relative rankings:
+    - All-Defense players evaluated within their position pool
+    - DPOY evaluated against their best position pool
+
+    We return negative loss so higher = better (for sorting).
 
     Args:
         results: List of EvaluationResult from different seasons
@@ -436,28 +536,25 @@ def calculate_objective_score(
     if not results:
         return -999.0
 
-    # Aggregate All-Defense average ranks
-    avg_ranks = [r.avg_rank for r in results if r.avg_rank < 900]
-    if not avg_ranks:
+    # Aggregate All-Defense position-adjusted average ranks
+    pos_adj_ranks = [r.pos_adj_avg_rank for r in results if r.pos_adj_avg_rank < 900]
+    if not pos_adj_ranks:
         return -999.0
 
-    # Component 1: Mean of All-Defense average ranks across seasons
-    all_defense_loss = float(np.mean(avg_ranks))
+    # Component 1: Mean of All-Defense position-adjusted average ranks across seasons
+    all_defense_loss = float(np.mean(pos_adj_ranks))
 
-    # Component 2: DPOY ranking gap (rank - 1, so #1 = 0 gap)
+    # Component 2: DPOY position ranking gap (rank - 1, so #1 = 0 gap)
     dpoy_gaps = []
     for r in results:
-        if r.dpoy_rank is not None:
-            dpoy_gaps.append(r.dpoy_rank - 1)
+        if r.dpoy_position_rank is not None:
+            dpoy_gaps.append(r.dpoy_position_rank - 1)
 
     dpoy_loss = float(np.mean(dpoy_gaps)) if dpoy_gaps else 0.0
 
-    # Total loss (weighted sum)
-    # Weight DPOY less since it's single player vs 10 All-Defense
-    alpha = 1.0  # All-Defense weight
-    beta = 0.5  # DPOY weight (single player, so lower weight)
-
-    total_loss = (alpha * all_defense_loss) + (beta * dpoy_loss)
+    # Total loss: Equal weight (no alpha/beta)
+    # 新公式: Loss = Avg_Pos_Rank_AllDefense + (DPOY_Pos_Rank - 1)
+    total_loss = all_defense_loss + dpoy_loss
 
     # Return negative loss (so higher = better for sorting)
     return -total_loss
@@ -576,7 +673,12 @@ def evaluate_on_test_set(
         print(f"Blind Spots: {result.blind_spots}")
         if result.dpoy_rank is not None:
             hit_str = " [HIT]" if result.dpoy_hit else ""
-            print(f"DPOY Rank: #{result.dpoy_rank}{hit_str}")
+            pos_rank_str = (
+                f" (Pos #{result.dpoy_position_rank})"
+                if result.dpoy_position_rank
+                else ""
+            )
+            print(f"DPOY Rank: #{result.dpoy_rank}{pos_rank_str}{hit_str}")
         if result.d_raptor_corr:
             print(f"D-RAPTOR Correlation: {result.d_raptor_corr:.3f}")
         if result.dbpm_corr:
@@ -606,26 +708,29 @@ def print_optimization_report(results: list[OptimizationResult], top_n: int = 5)
         print(f"      Guard D5 Impact: {p.guard_d5_impact:.2f}")
         print(f"      BAYES_C: {p.bayes_c}")
         print(f"      MD_K: {p.md_k:.3f}")
+        print(f"      SIGMOID_G0: {p.sigmoid_g0} games")
+        print(f"      ROAMER_K: {p.roamer_k:.2f}")
+        print(f"      D2_EXT_ROAMER_K: {p.d2_ext_roamer_k:.2f}")
 
-        print(f"    Training Results:")
+        print(f"    Training Results (using position-relative rankings):")
         for r in opt.training_results:
             dpoy_str = ""
-            if r.dpoy_rank is not None:
+            if r.dpoy_position_rank is not None:
                 hit_mark = " [HIT]" if r.dpoy_hit else ""
-                dpoy_str = f", DPOY=#{r.dpoy_rank}{hit_mark}"
+                dpoy_str = f", DPOY Pos=#{r.dpoy_position_rank}{hit_mark}"
             print(
-                f"      {r.season}: AvgRank={r.avg_rank:.1f}, "
+                f"      {r.season}: PosAvgRank={r.pos_adj_avg_rank:.1f}, "
                 f"R@10={r.recall_at_10:.0f}%, R@20={r.recall_at_20:.0f}%{dpoy_str}"
             )
 
         print(f"    Validation Results:")
         for r in opt.validation_results:
             dpoy_str = ""
-            if r.dpoy_rank is not None:
+            if r.dpoy_position_rank is not None:
                 hit_mark = " [HIT]" if r.dpoy_hit else ""
-                dpoy_str = f", DPOY=#{r.dpoy_rank}{hit_mark}"
+                dpoy_str = f", DPOY Pos=#{r.dpoy_position_rank}{hit_mark}"
             print(
-                f"      {r.season}: AvgRank={r.avg_rank:.1f}, "
+                f"      {r.season}: PosAvgRank={r.pos_adj_avg_rank:.1f}, "
                 f"R@10={r.recall_at_10:.0f}%, R@20={r.recall_at_20:.0f}%{dpoy_str}"
             )
 
@@ -639,6 +744,9 @@ def print_optimization_report(results: list[OptimizationResult], top_n: int = 5)
         guard_d5_impact=BASELINE_PARAMS["guard_d5_impact"],
         bayes_c=BASELINE_PARAMS["bayes_c"],
         md_k=BASELINE_PARAMS["md_k"],
+        sigmoid_g0=BASELINE_PARAMS["sigmoid_g0"],
+        roamer_k=BASELINE_PARAMS["roamer_k"],
+        d2_ext_roamer_k=BASELINE_PARAMS["d2_ext_roamer_k"],
     )
 
     # Find baseline in results or compute
@@ -651,6 +759,9 @@ def print_optimization_report(results: list[OptimizationResult], top_n: int = 5)
             and p.guard_d5_impact == baseline.guard_d5_impact
             and p.bayes_c == baseline.bayes_c
             and abs(p.md_k - baseline.md_k) < 0.001
+            and p.sigmoid_g0 == baseline.sigmoid_g0
+            and abs(p.roamer_k - baseline.roamer_k) < 0.01
+            and abs(p.d2_ext_roamer_k - baseline.d2_ext_roamer_k) < 0.01
         ):
             baseline_result = opt
             break
@@ -689,6 +800,9 @@ ROLE_CONFIG = {{
 
 BAYES_C = {best.bayes_c}
 MD_K = {best.md_k}
+SIGMOID_G0 = {best.sigmoid_g0}
+ROAMER_K = {best.roamer_k}
+D2_EXT_ROAMER_K = {best.d2_ext_roamer_k}
 """)
 
 
@@ -707,6 +821,9 @@ def main():
             guard_d5_impact=BASELINE_PARAMS["guard_d5_impact"],
             bayes_c=BASELINE_PARAMS["bayes_c"],
             md_k=BASELINE_PARAMS["md_k"],
+            sigmoid_g0=BASELINE_PARAMS["sigmoid_g0"],
+            roamer_k=BASELINE_PARAMS["roamer_k"],
+            d2_ext_roamer_k=BASELINE_PARAMS["d2_ext_roamer_k"],
         )
         evaluate_on_test_set(baseline)
         return
@@ -722,6 +839,9 @@ def main():
             guard_d5_impact=0.40,
             bayes_c=60,
             md_k=0.018,
+            sigmoid_g0=55,  # Optimized sigmoid midpoint
+            roamer_k=0.3,  # Roamer D5 adjustment coefficient
+            d2_ext_roamer_k=0.5,  # Roamer D2 exterior adjustment
         )
         evaluate_on_test_set(optimized)
         return

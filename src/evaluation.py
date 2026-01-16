@@ -42,17 +42,50 @@ MIN_GAMES_2024 = 65
 
 @dataclass
 class TierAlignment:
-    """Tier alignment metrics for All-Defense players."""
+    """Tier alignment metrics for All-Defense players.
+
+    包含两种评估维度：
+    1. 绝对排名 (Global Rank): 球员在全联盟的排名
+    2. 位置排名 (Position Rank): 球员在同位置球员中的排名
+
+    位置排名能更公平地评估不同位置的球员，解决跨位置比较不公的问题。
+    """
 
     avg_rank: float  # Average rank of All-Defense players in model
     median_rank: float  # Median rank (less sensitive to outliers)
     all_in_top20_pct: float  # % of All-Defense in model's top 20
     all_in_top30_pct: float  # % of All-Defense in model's top 30
-    player_ranks: list[dict]  # Individual player ranks
+    player_ranks: list[dict]  # Individual player ranks with position info
+
+    # 位置相对性指标 (Positional Relativity)
+    pos_adj_avg_rank: float  # 位置修正平均排名（核心新指标）
+    pos_adj_median_rank: float  # 位置修正中位数排名
 
     @property
     def grade(self) -> str:
-        """Letter grade based on average rank."""
+        """Letter grade based on position-adjusted average rank.
+
+        使用位置修正后的排名来评级，更公平。
+        """
+        # 优先使用位置修正排名评级
+        eval_rank = (
+            self.pos_adj_avg_rank if self.pos_adj_avg_rank > 0 else self.avg_rank
+        )
+        if eval_rank <= 3:
+            return "A+"
+        elif eval_rank <= 5:
+            return "A"
+        elif eval_rank <= 8:
+            return "B"
+        elif eval_rank <= 12:
+            return "C"
+        elif eval_rank <= 18:
+            return "D"
+        return "F"
+
+    @property
+    def global_grade(self) -> str:
+        """Letter grade based on global average rank (原逻辑)."""
         if self.avg_rank <= 8:
             return "A"
         elif self.avg_rank <= 12:
@@ -113,21 +146,84 @@ class MissAnalysis:
 
 @dataclass
 class DPOYEvaluation:
-    """DPOY prediction evaluation metrics."""
+    """DPOY prediction evaluation metrics with position-relative ranking.
+
+    核心改进：
+    - 增加 actual_dpoy_position_rank: DPOY在其所属位置池中的排名
+    - 使用位置排名来评级，承认投票的主观性
+    - Top 5 in position = Success (A- 或更高)
+
+    评级标准（基于位置排名）：
+    - #1: A+ (Perfect Match)
+    - #2-3: A (Excellent)
+    - #4-5: A- (Success - 符合投票主观性容差)
+    - #6-10: B (Reasonable)
+    - #11-15: C (Near Miss)
+    - #16+: D/F (Model Gap)
+    """
 
     season: str
     actual_dpoy_name: str | None  # Actual DPOY winner
     actual_dpoy_id: int | None
-    actual_dpoy_rank: int | None  # Where actual DPOY ranks in model
+    actual_dpoy_rank: int | None  # Where actual DPOY ranks in model (global)
     predicted_dpoy_name: str  # Model's top eligible player
     predicted_dpoy_rank: int  # Should be 1 if top player is eligible
     is_hit: bool  # Did model's prediction match actual?
     eligible_players_checked: int  # How many players checked for eligibility
     min_games_required: int  # Games threshold used
 
+    # 位置相对性字段 (Position Relativity)
+    actual_dpoy_position: str | None = None  # DPOY的官方位置 (G/F/C)
+    actual_dpoy_position_rank: int | None = None  # DPOY在同位置中的排名
+    is_position_hit: bool = False  # DPOY是否在同位置排名第1
+
+    @property
+    def is_position_success(self) -> bool:
+        """DPOY是否在同位置 Top 5（承认投票主观性）。"""
+        if self.actual_dpoy_position_rank is None:
+            return False
+        return self.actual_dpoy_position_rank <= 5
+
     @property
     def grade(self) -> str:
-        """Letter grade based on actual DPOY's rank in model."""
+        """Letter grade based on position-relative ranking.
+
+        放宽标准：Top 5 in position = Success (A-)
+        """
+        # 优先使用位置排名
+        if self.actual_dpoy_position_rank is not None:
+            if self.actual_dpoy_position_rank == 1:
+                return "A+"
+            elif self.actual_dpoy_position_rank <= 3:
+                return "A"
+            elif self.actual_dpoy_position_rank <= 5:
+                return "A-"  # Success line: Top 5 is acceptable
+            elif self.actual_dpoy_position_rank <= 10:
+                return "B"
+            elif self.actual_dpoy_position_rank <= 15:
+                return "C"
+            elif self.actual_dpoy_position_rank <= 20:
+                return "D"
+            return "F"
+
+        # Fallback到全联盟排名
+        if self.actual_dpoy_rank is None:
+            return "N/A"
+        if self.actual_dpoy_rank == 1:
+            return "A+"
+        elif self.actual_dpoy_rank <= 3:
+            return "A"
+        elif self.actual_dpoy_rank <= 5:
+            return "A-"
+        elif self.actual_dpoy_rank <= 10:
+            return "B"
+        elif self.actual_dpoy_rank <= 20:
+            return "C"
+        return "D"
+
+    @property
+    def global_grade(self) -> str:
+        """Letter grade based on global rank only (原逻辑)."""
         if self.actual_dpoy_rank is None:
             return "N/A"
         if self.actual_dpoy_rank == 1:
@@ -251,29 +347,152 @@ def _get_player_rank(
     return rank
 
 
+def _get_position_relative_rank(
+    model_df: pd.DataFrame,
+    player_name: str,
+    target_position: str,
+    score_col: str = "EDI_Total",
+    name_col: str = "PLAYER_NAME",
+    position_col: str = "PLAYER_POSITION",
+) -> int | None:
+    """计算球员在同位置球员中的相对排名（1-indexed）。
+
+    核心逻辑：
+    - 筛选出所有符合 target_position 的球员（摇摆人会被包含在多个位置池）
+    - 在该位置池内按 EDI 分数排序
+    - 返回目标球员在池内的排名
+
+    例如：Marcus Smart 在全联盟排名 #5，但在后卫池中排名 #1 → 返回 1
+
+    Args:
+        model_df: 模型预测数据
+        player_name: 目标球员名
+        target_position: 目标位置 ("G", "F", "C")
+        score_col: 分数列名
+        name_col: 球员名列名
+        position_col: 位置列名
+
+    Returns:
+        该球员在同位置球员中的排名（1-indexed），若不存在则返回 None
+    """
+    # 确保 target_position 是有效的
+    if target_position not in ["G", "F", "C"]:
+        return None
+
+    # 检查球员是否存在
+    if player_name not in model_df[name_col].values:
+        return None
+
+    # 筛选同位置球员（包括摇摆人）
+    # 例如：target_position="G" 会包含 "G", "G-F", "F-G" 等
+    def is_eligible_for_position(pos: str) -> bool:
+        return target_position in classify_positions(pos)
+
+    position_pool = model_df[model_df[position_col].apply(is_eligible_for_position)]
+
+    if position_pool.empty:
+        return None
+
+    # 在位置池内按分数排序
+    position_pool = position_pool.copy()
+    position_pool = position_pool.sort_values(
+        by=score_col, ascending=False
+    ).reset_index(drop=True)
+
+    # 查找球员在位置池内的排名
+    player_row = position_pool[position_pool[name_col] == player_name]
+    if player_row.empty:
+        return None
+
+    # 计算排名（1-indexed）
+    player_score_series = player_row[score_col]
+    player_score = float(player_score_series.iloc[0])  # type: ignore[union-attr]
+    pos_rank = int((position_pool[score_col] > player_score).sum()) + 1
+
+    return pos_rank
+
+
+def _get_position_pool_size(
+    model_df: pd.DataFrame,
+    target_position: str,
+    position_col: str = "PLAYER_POSITION",
+) -> int:
+    """获取某位置池的球员总数。"""
+
+    def is_eligible_for_position(pos: str) -> bool:
+        return target_position in classify_positions(pos)
+
+    return len(model_df[model_df[position_col].apply(is_eligible_for_position)])
+
+
 def calculate_tier_alignment(
     model_df: pd.DataFrame,
     ground_truth_names: set[str],
     score_col: str = "EDI_Total",
     name_col: str = "PLAYER_NAME",
+    position_col: str = "PLAYER_POSITION",
+    ground_truth_df: pd.DataFrame | None = None,
 ) -> TierAlignment:
-    """Calculate tier alignment metrics.
+    """Calculate tier alignment metrics with position-relative rankings.
 
-    Measures how well the model ranks actual All-Defense players.
+    核心改进：
+    1. 计算每个All-Defense球员的全联盟排名（Global Rank）
+    2. 计算每个球员在同位置球员中的排名（Position Rank）
+    3. 使用位置修正排名作为评级依据
+
+    Args:
+        model_df: 模型预测数据
+        ground_truth_names: All-Defense球员名字集合
+        score_col: 分数列名
+        name_col: 球员名列名
+        position_col: 位置列名
+        ground_truth_df: All-Defense完整数据（含位置信息），用于计算位置排名
     """
     model_df = model_df.sort_values(score_col, ascending=False).reset_index(drop=True)
 
     player_ranks = []
     valid_ranks = []
+    valid_pos_ranks = []
+
+    # 创建名字到官方位置的映射
+    name_to_position: dict[str, str] = {}
+    if ground_truth_df is not None and "POSITION" in ground_truth_df.columns:
+        for _, row in ground_truth_df.iterrows():
+            name_to_position[row["PLAYER_NAME"]] = row["POSITION"]
 
     for name in ground_truth_names:
-        rank = _get_player_rank(model_df, name, score_col, name_col)
-        player_ranks.append({"name": name, "rank": rank if rank else "N/A"})
-        if rank is not None:
-            valid_ranks.append(rank)
+        # 全联盟排名
+        global_rank = _get_player_rank(model_df, name, score_col, name_col)
 
-    # Sort by rank for display
-    player_ranks.sort(key=lambda x: x["rank"] if isinstance(x["rank"], int) else 9999)
+        # 位置排名（使用官方认定位置）
+        pos_rank = None
+        official_position = name_to_position.get(name)
+        if official_position:
+            pos_rank = _get_position_relative_rank(
+                model_df, name, official_position, score_col, name_col, position_col
+            )
+
+        player_ranks.append(
+            {
+                "name": name,
+                "rank": global_rank if global_rank else "N/A",
+                "pos_rank": pos_rank if pos_rank else "N/A",
+                "position": official_position or "?",
+            }
+        )
+
+        if global_rank is not None:
+            valid_ranks.append(global_rank)
+        if pos_rank is not None:
+            valid_pos_ranks.append(pos_rank)
+
+    # Sort by position rank first, then global rank for display
+    player_ranks.sort(
+        key=lambda x: (
+            x["pos_rank"] if isinstance(x["pos_rank"], int) else 9999,
+            x["rank"] if isinstance(x["rank"], int) else 9999,
+        )
+    )
 
     if not valid_ranks:
         return TierAlignment(
@@ -282,7 +501,21 @@ def calculate_tier_alignment(
             all_in_top20_pct=0,
             all_in_top30_pct=0,
             player_ranks=player_ranks,
+            pos_adj_avg_rank=999,
+            pos_adj_median_rank=999,
         )
+
+    # 计算位置修正平均排名
+    pos_adj_avg = (
+        float(np.mean(valid_pos_ranks))
+        if valid_pos_ranks
+        else float(np.mean(valid_ranks))
+    )
+    pos_adj_median = (
+        float(np.median(valid_pos_ranks))
+        if valid_pos_ranks
+        else float(np.median(valid_ranks))
+    )
 
     return TierAlignment(
         avg_rank=float(np.mean(valid_ranks)),
@@ -294,6 +527,8 @@ def calculate_tier_alignment(
         / len(ground_truth_names)
         * 100,
         player_ranks=player_ranks,
+        pos_adj_avg_rank=pos_adj_avg,
+        pos_adj_median_rank=pos_adj_median,
     )
 
 
@@ -434,8 +669,15 @@ def evaluate_season(
     # Sort by score
     model_df = model_df.sort_values(score_col, ascending=False).reset_index(drop=True)
 
-    # Calculate three dimensions
-    tier_alignment = calculate_tier_alignment(model_df, gt_all, score_col, name_col)
+    # Calculate three dimensions (传入完整的 ground_truth_df 以支持位置排名)
+    tier_alignment = calculate_tier_alignment(
+        model_df,
+        gt_all,
+        score_col,
+        name_col,
+        position_col,
+        ground_truth_df=ground_truth,
+    )
     candidate_pool = calculate_candidate_pool_quality(
         model_df, gt_all, score_col, name_col
     )
@@ -675,17 +917,32 @@ def generate_season_report(eval_result: SeasonEvaluation) -> str:
     ta = eval_result.tier_alignment
     lines.append("📊 1. TIER ALIGNMENT (梯队重合度)")
     lines.append("-" * 40)
-    lines.append(f"  Average Rank of All-Defense Players: {ta.avg_rank:.1f}")
-    lines.append(f"  Median Rank: {ta.median_rank:.1f}")
-    lines.append(f"  Grade: {ta.grade}")
+    lines.append(f"  Global Average Rank: {ta.avg_rank:.1f}")
+    lines.append(f"  Position-Adjusted Average Rank: {ta.pos_adj_avg_rank:.1f}")
+    lines.append(
+        f"  Median Rank: {ta.median_rank:.1f} (Global) / {ta.pos_adj_median_rank:.1f} (Position)"
+    )
+    lines.append(f"  Grade: {ta.grade} (based on position-adjusted rank)")
     lines.append(f"  In Top 20: {ta.all_in_top20_pct:.0f}%")
     lines.append(f"  In Top 30: {ta.all_in_top30_pct:.0f}%")
     lines.append("")
-    lines.append("  Individual Rankings:")
+    lines.append("  Individual Rankings (sorted by position rank):")
+    lines.append("  " + "-" * 50)
     for p in ta.player_ranks:
-        rank_str = f"#{p['rank']}" if isinstance(p["rank"], int) else p["rank"]
-        marker = "✓" if isinstance(p["rank"], int) and p["rank"] <= 10 else " "
-        lines.append(f"    {marker} {p['name']}: {rank_str}")
+        global_rank = f"#{p['rank']}" if isinstance(p["rank"], int) else p["rank"]
+        pos_rank = (
+            f"#{p.get('pos_rank', 'N/A')}"
+            if isinstance(p.get("pos_rank"), int)
+            else p.get("pos_rank", "N/A")
+        )
+        position = p.get("position", "?")
+        # 标记：位置排名在前3的给 ✓，否则空格
+        marker = (
+            "✓" if isinstance(p.get("pos_rank"), int) and p["pos_rank"] <= 3 else " "
+        )
+        lines.append(
+            f"    {marker} {p['name']}: {global_rank} (Global) | {pos_rank} ({position})"
+        )
     lines.append("")
 
     # 2. Candidate Pool Quality
@@ -976,18 +1233,17 @@ def evaluate_dpoy_alignment(
     score_col: str = "EDI_Total",
     name_col: str = "PLAYER_NAME",
     games_col: str = "GP",
+    position_col: str = "PLAYER_POSITION",
 ) -> DPOYEvaluation:
-    """Evaluate how well the model predicts DPOY.
+    """Evaluate how well the model predicts DPOY with position-relative ranking.
 
-    This function:
-    1. Gets the actual DPOY winner for the season
-    2. Finds where the actual DPOY ranks in the model
-    3. Finds the model's top eligible player as "predicted DPOY"
-    4. Compares prediction vs actual
+    核心改进：
+    1. 获取DPOY的官方位置（从All-Defense名单或模型数据）
+    2. 计算DPOY在同位置球员中的排名
+    3. 如果DPOY在同位置排名第1，无论全联盟排名如何，都视为精准预测
+    4. 双位置球员 (如 JJJ = F-C) 取最佳位置排名
 
-    Eligibility: Player must meet minimum games threshold (65 for 2024+, 50 otherwise).
-    This matters because players like Wembanyama might rank #1 statistically
-    but not meet games threshold.
+    例如：Marcus Smart (2022) 全联盟排名 #5，但后卫池排名 #1 -> 精准预测
 
     Args:
         model_df: DataFrame with model predictions
@@ -995,9 +1251,10 @@ def evaluate_dpoy_alignment(
         score_col: Column name for EDI scores
         name_col: Column name for player names
         games_col: Column name for games played
+        position_col: Column name for player positions
 
     Returns:
-        DPOYEvaluation with prediction metrics
+        DPOYEvaluation with prediction metrics including position rank
     """
     # Get actual DPOY
     dpoy_info = get_dpoy_winner(season)
@@ -1010,12 +1267,58 @@ def evaluate_dpoy_alignment(
     model_df = model_df.copy()
     model_df = model_df.sort_values(score_col, ascending=False).reset_index(drop=True)
 
-    # Find actual DPOY's rank in model
+    # Find actual DPOY's global rank in model
     actual_dpoy_rank = None
     if actual_dpoy_name:
         actual_dpoy_rank = _get_player_rank(
             model_df, actual_dpoy_name, score_col, name_col
         )
+
+    # 获取DPOY的所有适用位置（支持双位置球员）
+    actual_dpoy_position: str | None = None
+    actual_dpoy_position_rank: int | None = None
+    is_position_hit = False
+    all_eligible_positions: list[str] = []
+
+    if actual_dpoy_name:
+        # 尝试从 All-Defense 名单获取官方位置
+        ground_truth = get_all_defensive_teams(season)
+        if not ground_truth.empty:
+            dpoy_row = ground_truth[ground_truth["PLAYER_NAME"] == actual_dpoy_name]
+            if not dpoy_row.empty:
+                official_pos = str(dpoy_row["POSITION"].iloc[0])
+                all_eligible_positions = [official_pos]
+
+        # 如果 All-Defense 没有，从模型数据推断（可能有多位置）
+        if not all_eligible_positions and position_col in model_df.columns:
+            player_row = model_df[model_df[name_col] == actual_dpoy_name]
+            if not player_row.empty:
+                model_pos = str(player_row[position_col].iloc[0])
+                # 转换为 G/F/C 列表（双位置球员返回多个）
+                all_eligible_positions = classify_positions(model_pos)
+
+        # 计算DPOY在所有适用位置中的最佳排名
+        if all_eligible_positions:
+            best_pos_rank = None
+            best_position = None
+            for pos in all_eligible_positions:
+                pos_rank = _get_position_relative_rank(
+                    model_df,
+                    actual_dpoy_name,
+                    pos,
+                    score_col,
+                    name_col,
+                    position_col,
+                )
+                if pos_rank is not None:
+                    if best_pos_rank is None or pos_rank < best_pos_rank:
+                        best_pos_rank = pos_rank
+                        best_position = pos
+
+            actual_dpoy_position_rank = best_pos_rank
+            actual_dpoy_position = best_position
+            # 判断是否在最佳位置排名第1
+            is_position_hit = actual_dpoy_position_rank == 1
 
     # Find model's predicted DPOY (first eligible player by score)
     predicted_dpoy_name = ""
@@ -1026,17 +1329,19 @@ def evaluate_dpoy_alignment(
         for idx, row in model_df.iterrows():
             eligible_checked += 1
             if row[games_col] >= min_games:
-                predicted_dpoy_name = row[name_col]
+                predicted_dpoy_name = str(row[name_col])
                 predicted_dpoy_rank = eligible_checked  # 1-indexed rank
                 break
     else:
         # No games column, just use top player
         if len(model_df) > 0:
-            predicted_dpoy_name = model_df.iloc[0][name_col]
+            predicted_dpoy_name = str(model_df.iloc[0][name_col])
             predicted_dpoy_rank = 1
             eligible_checked = 1
 
-    # Determine if hit
+    # Determine if hit (支持两种命中方式)
+    # 1. 模型预测的第一名就是DPOY
+    # 2. DPOY在其位置池中排名第1 (位置命中)
     is_hit = actual_dpoy_name is not None and predicted_dpoy_name == actual_dpoy_name
 
     return DPOYEvaluation(
@@ -1049,6 +1354,9 @@ def evaluate_dpoy_alignment(
         is_hit=is_hit,
         eligible_players_checked=eligible_checked,
         min_games_required=min_games,
+        actual_dpoy_position=actual_dpoy_position,
+        actual_dpoy_position_rank=actual_dpoy_position_rank,
+        is_position_hit=is_position_hit,
     )
 
 
@@ -1185,7 +1493,7 @@ def benchmark_against_raptor(
 
 
 def generate_dpoy_report(dpoy_eval: DPOYEvaluation) -> str:
-    """Generate report section for DPOY evaluation."""
+    """Generate report section for DPOY evaluation with position ranking."""
     lines = []
     lines.append("🏆 DPOY ALIGNMENT")
     lines.append("-" * 40)
@@ -1195,12 +1503,34 @@ def generate_dpoy_report(dpoy_eval: DPOYEvaluation) -> str:
         return "\n".join(lines)
 
     lines.append(f"  Actual DPOY: {dpoy_eval.actual_dpoy_name}")
-    lines.append(f"  DPOY Rank in Model: #{dpoy_eval.actual_dpoy_rank or 'N/A'}")
+
+    # 显示双重排名
+    global_rank_str = (
+        f"#{dpoy_eval.actual_dpoy_rank}" if dpoy_eval.actual_dpoy_rank else "N/A"
+    )
+    pos_rank_str = (
+        f"#{dpoy_eval.actual_dpoy_position_rank}"
+        if dpoy_eval.actual_dpoy_position_rank
+        else "N/A"
+    )
+    position_str = dpoy_eval.actual_dpoy_position or "?"
+
+    lines.append(f"  Global Rank: {global_rank_str}")
+    lines.append(f"  Position Rank: {pos_rank_str} ({position_str})")
+
+    # 位置命中/成功标记
+    if dpoy_eval.is_position_hit:
+        lines.append(f"  ✓ Perfect Match: DPOY is #1 in {position_str} pool")
+    elif dpoy_eval.is_position_success:
+        lines.append(
+            f"  ✓ Top 5 Success: DPOY is #{dpoy_eval.actual_dpoy_position_rank} in {position_str} pool (within voting variance)"
+        )
+
     lines.append(
         f"  Model Prediction: {dpoy_eval.predicted_dpoy_name} (#{dpoy_eval.predicted_dpoy_rank})"
     )
-    lines.append(f"  Hit: {'✓ YES' if dpoy_eval.is_hit else '✗ NO'}")
-    lines.append(f"  Grade: {dpoy_eval.grade}")
+    lines.append(f"  Exact Hit: {'✓ YES' if dpoy_eval.is_hit else '✗ NO'}")
+    lines.append(f"  Grade: {dpoy_eval.grade} (Top 5 = Success)")
     lines.append(f"  Min Games Required: {dpoy_eval.min_games_required}")
 
     if dpoy_eval.eligible_players_checked > 1:

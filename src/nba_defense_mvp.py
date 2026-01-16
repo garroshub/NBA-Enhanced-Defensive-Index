@@ -61,7 +61,44 @@ TARGET_PLAYERS = [
 MIN_MIN = 15
 
 # 贝叶斯收缩常数
-BAYES_C = 50  # 收缩强度：样本量达到 C 时，数据权重 = 50%
+BAYES_C = 60  # 收缩强度：样本量达到 C 时，数据权重 = 50%
+
+# Sigmoid 可用性参数 (Availability Sigmoid)
+# 用于惩罚低出场球员，同时防止铁人刷分
+SIGMOID_G0 = 45  # Sigmoid 中点 (场次阈值)
+SIGMOID_K = 0.15  # Sigmoid 斜率
+
+# Roamer 动态权重调节系数 (Roamer Dynamic Weight Adjustment)
+# 用于识别"扫荡型内线"(如 JJJ)，降低其篮板权重和外线防守权重
+# Roamer_Index = BLK_per_36 / (DREB_PCT + 0.01)
+# W5_Adjusted = W5_Base * D5_IMPACT * (1 - ROAMER_K * Roamer_Percentile)
+ROAMER_K = 0.3  # D5 灵敏度：0.3 表示最极端的扫荡者 D5 权重降至 0.7
+
+# D2 外线权重调整系数 (D2 Exterior Weight Adjustment for Roamers)
+# Roamer 球员主要护筐，外线防守样本少且不代表其价值
+# adjusted_ext = base_ext * (1 - D2_EXT_ROAMER_K * Roamer_Pct)
+# Roamer_Pct=1.0: 外线权重从 45% 降至 22.5%
+# Roamer_Pct=0.0: 外线权重保持 45%
+D2_EXT_ROAMER_K = 0.5  # 最大降低 50% 的外线权重
+
+
+def sigmoid_availability(games, g0=SIGMOID_G0, k=SIGMOID_K):
+    """计算可用性因子 (Sigmoid 函数)。
+
+    - 低于 g0: 快速接近 0 (淘汰低出场球员)
+    - 等于 g0: 返回 0.5 (及格线)
+    - 高于 g0: 逐渐接近 1.0 (边际效用递减，防止铁人刷分)
+
+    Args:
+        games: 出场场次
+        g0: Sigmoid 中点 (默认 45 场)
+        k: 斜率因子 (默认 0.15)
+
+    Returns:
+        可用性因子 (0-1)
+    """
+    return 1.0 / (1.0 + np.exp(-k * (games - g0)))
+
 
 # =============================================================================
 # 角色相关性系数 (Role Relevance Coefficient)
@@ -70,13 +107,13 @@ BAYES_C = 50  # 收缩强度：样本量达到 C 时，数据权重 = 50%
 # =============================================================================
 ROLE_CONFIG = {
     "Guards": {
-        "D2_EXT_WEIGHT": 0.6,  # 外线 (三分防守) 权重
-        "D2_INT_WEIGHT": 0.4,  # 内线 (护筐) 权重
-        "D5_IMPACT": 0.5,  # 篮板权重衰减系数
+        "D2_EXT_WEIGHT": 0.65,  # 外线 (三分防守) 权重
+        "D2_INT_WEIGHT": 0.35,  # 内线 (护筐) 权重
+        "D5_IMPACT": 0.4,  # 篮板权重衰减系数
     },
     "Frontcourt": {
-        "D2_EXT_WEIGHT": 0.4,  # 外线 (三分防守) 权重
-        "D2_INT_WEIGHT": 0.6,  # 内线 (护筐) 权重
+        "D2_EXT_WEIGHT": 0.45,  # 外线 (三分防守) 权重
+        "D2_INT_WEIGHT": 0.55,  # 内线 (护筐) 权重
         "D5_IMPACT": 1.0,  # 篮板权重完整保留
     },
 }
@@ -437,7 +474,7 @@ def analyze_season(target_season):
         # MD adjustment: subtract expected impact from PLUSMINUS
         # Higher MD (defending better scorers) allows higher PLUSMINUS
         # Each +1 std MD allows +1.5% higher opponent FG%
-        MD_K = 0.015  # MD adjustment coefficient (1.5% per std)
+        MD_K = 0.018  # MD adjustment coefficient (1.8% per std)
         base_df["PCT_PLUSMINUS_ADJ"] = base_df["PCT_PLUSMINUS"] - (
             MD_K * base_df["MD_Zscore"]
         )
@@ -533,27 +570,54 @@ def analyze_season(target_season):
     # 添加角色分类
     base_df["ROLE"] = base_df["PLAYER_POSITION"].apply(classify_role)
 
+    # --- 计算 Roamer_Index 和 Roamer_Pct (用于 D2 和 D5 权重调整) ---
+    # Roamer_Index = BLK_per_36 / (DREB_PCT + 0.01)
+    # 高值 = 扫荡型内线 (盖帽多，篮板少)
+    base_df["BLK_per_36"] = base_df["BLK"] / base_df["MIN"] * 36
+    base_df["Roamer_Index"] = base_df["BLK_per_36"] / (base_df["DREB_PCT"] + 0.01)
+
+    # 仅对 Frontcourt 球员计算百分位排名
+    frontcourt_mask = base_df["ROLE"] == "Frontcourt"
+    base_df.loc[frontcourt_mask, "Roamer_Pct"] = base_df.loc[
+        frontcourt_mask, "Roamer_Index"
+    ].rank(pct=True)
+    base_df["Roamer_Pct"] = base_df["Roamer_Pct"].fillna(0)  # Guards 不受影响
+
     def calc_d2_raw(row):
         role = row["ROLE"]
         config = ROLE_CONFIG[role]
-        return (rim_raw[row.name] * config["D2_INT_WEIGHT"]) + (
-            pt3_raw[row.name] * config["D2_EXT_WEIGHT"]
-        )
+        base_int = config["D2_INT_WEIGHT"]
+        base_ext = config["D2_EXT_WEIGHT"]
+
+        # Roamer 动态外线权重调整 (仅 Frontcourt)
+        # adjusted_ext = base_ext * (1 - D2_EXT_ROAMER_K * Roamer_Pct)
+        roamer_pct = row.get("Roamer_Pct", 0) if role == "Frontcourt" else 0
+        adjusted_ext = base_ext * (1 - D2_EXT_ROAMER_K * roamer_pct)
+        adjusted_int = 1 - adjusted_ext
+
+        return (rim_raw[row.name] * adjusted_int) + (pt3_raw[row.name] * adjusted_ext)
 
     base_df["D2_Raw"] = base_df.apply(calc_d2_raw, axis=1)
 
-    # 样本量 = 护筐防守次数 + 三分防守次数 (基于角色加权)
+    # 样本量 = 护筐防守次数 + 三分防守次数 (基于角色加权，含 Roamer 调整)
     rim_fga = base_df["Rim_FGA"].fillna(0) * base_df["GP"]
     fg3_fga = base_df["FG3_FGA"].fillna(0) * base_df["GP"]
 
     def calc_d2_n(row):
         role = row["ROLE"]
         config = ROLE_CONFIG[role]
-        return (rim_fga[row.name] * config["D2_INT_WEIGHT"]) + (
-            fg3_fga[row.name] * config["D2_EXT_WEIGHT"]
-        )
+        base_int = config["D2_INT_WEIGHT"]
+        base_ext = config["D2_EXT_WEIGHT"]
+
+        # Roamer 动态外线权重调整 (与 D2_Raw 一致)
+        roamer_pct = row.get("Roamer_Pct", 0) if role == "Frontcourt" else 0
+        adjusted_ext = base_ext * (1 - D2_EXT_ROAMER_K * roamer_pct)
+        adjusted_int = 1 - adjusted_ext
+
+        return (rim_fga[row.name] * adjusted_int) + (fg3_fga[row.name] * adjusted_ext)
 
     base_df["D2_N"] = base_df.apply(calc_d2_n, axis=1)
+    print("   D2 (Zone Defense - Roamer-adjusted): OK")
 
     d2_result = base_df.apply(lambda r: bayesian_score(r["D2_Raw"], r["D2_N"]), axis=1)
     base_df["D2_Score"] = d2_result.apply(lambda x: x[0])
@@ -608,7 +672,12 @@ def analyze_season(target_season):
     base_df["W5"] = base_df.apply(
         lambda r: r["W5_Base"] * ROLE_CONFIG[r["ROLE"]]["D5_IMPACT"], axis=1
     )
-    print("   D5 (Anchor/DREB%): OK (Role-adjusted)")
+
+    # --- Roamer 动态 D5 权重调节 ---
+    # Roamer_Pct 已在 D2 计算前计算完成
+    # 应用动态调整: W5 = W5 * (1 - ROAMER_K * Roamer_Pct)
+    base_df["W5"] = base_df["W5"] * (1 - ROAMER_K * base_df["Roamer_Pct"])
+    print("   D5 (Anchor/DREB%): OK (Role-adjusted, Roamer-corrected)")
 
     # =============================================================================
     # 效率模型框架 (Efficiency Model Framework)
@@ -691,6 +760,12 @@ def analyze_season(target_season):
         (output_weighted + input_weighted + d5_weighted) / total_weight * 100,
         50.0,
     )
+
+    # Step 6: 应用 Sigmoid 可用性调整
+    # 公式: EDI_Final = EDI_Raw * Sigmoid(GP)
+    # 这会惩罚低出场球员，同时防止铁人刷分 (边际效用递减)
+    base_df["Sigmoid_Factor"] = base_df["GP"].apply(sigmoid_availability)
+    base_df["EDI_Total"] = base_df["EDI_Total"] * base_df["Sigmoid_Factor"]
 
     # 计算效率残差 (用于分析)
     base_df["Efficiency_Residual"] = (
