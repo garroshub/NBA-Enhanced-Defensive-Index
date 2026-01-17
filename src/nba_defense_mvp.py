@@ -74,12 +74,41 @@ SIGMOID_K = 0.15  # Sigmoid 斜率
 # W5_Adjusted = W5_Base * D5_IMPACT * (1 - ROAMER_K * Roamer_Percentile)
 ROAMER_K = 0.3  # D5 灵敏度：0.3 表示最极端的扫荡者 D5 权重降至 0.7
 
+# Roamer 分类阈值 (Roamer Classification Threshold)
+# Frontcourt 球员 Roamer_Pct >= ROAMER_THRESHOLD 时被分类为 Roamer
+# [2025-01-17 优化结果: 0.15 阈值覆盖主要扫荡型内线]
+ROAMER_THRESHOLD = 0.15  # 15th 百分位以上视为 Roamer
+
+# Roamer 权重重分配系数 (Roamer Weight Redistribution)
+# 将 Roamer 球员因 D5 降权而失去的权重，重新分配到其表现突出的维度
+# 这体现了"职责分工"的公平性：扫荡者牺牲篮板换取协防，应获得相应补偿
+# 分配策略: 30% 补给产出层 (W1+W2)，70% 补给活力层 (W3)
+# [2025-01-17 优化结果: DPOY Avg Rank=2.80, Recall@30=35/50, JJJ Roamer #6]
+ROAMER_WEIGHT_REDIST_OUTPUT = 0.3  # 分配给产出层 (D1/D2) 的比例
+ROAMER_WEIGHT_REDIST_HUSTLE = 0.7  # 分配给活力层 (D3) 的比例
+
 # D2 外线权重调整系数 (D2 Exterior Weight Adjustment for Roamers)
 # Roamer 球员主要护筐，外线防守样本少且不代表其价值
 # adjusted_ext = base_ext * (1 - D2_EXT_ROAMER_K * Roamer_Pct)
 # Roamer_Pct=1.0: 外线权重从 45% 降至 22.5%
 # Roamer_Pct=0.0: 外线权重保持 45%
 D2_EXT_ROAMER_K = 0.5  # 最大降低 50% 的外线权重
+
+# =============================================================================
+# 协同效应加分 (Synergy Bonus for Switchable Defenders)
+# =============================================================================
+# 奖励"换防全能型"防守者：内线能护筐 + 外线也能防
+# 典型代表: JJJ, Anthony Davis, Bam Adebayo, Wembanyama
+# 设计理念: 基于 D1 (对位压制) 和 D2 (内外封锁) 的真实防守效果
+#           而非 D3/D4 的"投入指标"，避免奖励像库里这种高活力但效果一般的球员
+# 公式 (平方根版，削峰填谷):
+#   if D1 >= T1 and D2 >= T2:
+#       Synergy_Bonus = sqrt((D1 - T1) * (D2 - T2)) * SYNERGY_FACTOR * 100
+# 平方根逻辑: 缓解马太效应，让"准顶级全能者"也能获得合理加分
+# [2025-01-17 优化结果: D1=0.80, D2=0.75, SF=0.5 实现最佳平衡]
+SYNERGY_D1_THRESHOLD = 0.80  # D1 (对位压制) 阈值，约 80th 百分位
+SYNERGY_D2_THRESHOLD = 0.75  # D2 (内外封锁) 阈值，约 75th 百分位
+SYNERGY_FACTOR = 0.5  # 协同因子 (削弱版: 顶级+8~12分, JJJ类+4~6分)
 
 
 def sigmoid_availability(games, g0=SIGMOID_G0, k=SIGMOID_K):
@@ -676,8 +705,40 @@ def analyze_season(target_season):
     # --- Roamer 动态 D5 权重调节 ---
     # Roamer_Pct 已在 D2 计算前计算完成
     # 应用动态调整: W5 = W5 * (1 - ROAMER_K * Roamer_Pct)
+    # 先保存调整前的 W5 用于计算权重损失
+    base_df["W5_Before_Roamer"] = base_df["W5"].copy()
     base_df["W5"] = base_df["W5"] * (1 - ROAMER_K * base_df["Roamer_Pct"])
-    print("   D5 (Anchor/DREB%): OK (Role-adjusted, Roamer-corrected)")
+
+    # --- Roamer 权重重分配 (Weight Redistribution) ---
+    # 将 Roamer 球员因 D5 降权而失去的权重，重新分配到产出层和活力层
+    # 这体现了"职责分工"的公平性：扫荡者牺牲篮板换取协防，应获得相应补偿
+    base_df["W5_Lost"] = base_df["W5_Before_Roamer"] - base_df["W5"]
+
+    # 分配给产出层 (W1/W2): 按 W1:W2 的原有比例分配
+    w1_w2_total = base_df["W1"] + base_df["W2"] + 1e-6
+    base_df["W1"] = base_df["W1"] + base_df["W5_Lost"] * ROAMER_WEIGHT_REDIST_OUTPUT * (
+        base_df["W1"] / w1_w2_total
+    )
+    base_df["W2"] = base_df["W2"] + base_df["W5_Lost"] * ROAMER_WEIGHT_REDIST_OUTPUT * (
+        base_df["W2"] / w1_w2_total
+    )
+
+    # 分配给活力层 (W3): 全部分配给 D3
+    base_df["W3"] = base_df["W3"] + base_df["W5_Lost"] * ROAMER_WEIGHT_REDIST_HUSTLE
+
+    # 打印权重重分配统计
+    roamer_beneficiaries = (base_df["W5_Lost"] > 0.05).sum()
+    if roamer_beneficiaries > 0:
+        print(f"   Roamer 权重重分配: {roamer_beneficiaries} 名球员受益")
+        top_beneficiaries = base_df.nlargest(3, "W5_Lost")[["PLAYER_NAME", "W5_Lost"]]
+        for _, row in top_beneficiaries.iterrows():
+            print(
+                f"      {row['PLAYER_NAME']}: W5 损失 {row['W5_Lost']:.3f} -> 重分配到 W1/W2/W3"
+            )
+
+    print(
+        "   D5 (Anchor/DREB%): OK (Role-adjusted, Roamer-corrected, Weight-redistributed)"
+    )
 
     # =============================================================================
     # 效率模型框架 (Efficiency Model Framework)
@@ -766,6 +827,29 @@ def analyze_season(target_season):
     # 这会惩罚低出场球员，同时防止铁人刷分 (边际效用递减)
     base_df["Sigmoid_Factor"] = base_df["GP"].apply(sigmoid_availability)
     base_df["EDI_Total"] = base_df["EDI_Total"] * base_df["Sigmoid_Factor"]
+
+    # Step 7: 协同效应加分 (Synergy Bonus for Switchable Defenders)
+    # 奖励同时具备高 D1 (对位压制) 和高 D2 (内外封锁) 的"换防全能型"防守者
+    # 公式 (平方根版): sqrt((D1 - T1) * (D2 - T2)) * Factor * 100
+    def calc_synergy_bonus(row):
+        d1, d2 = row["D1_Score"], row["D2_Score"]
+        if d1 >= SYNERGY_D1_THRESHOLD and d2 >= SYNERGY_D2_THRESHOLD:
+            # 平方根公式：削峰填谷，缓解马太效应
+            raw_synergy = (d1 - SYNERGY_D1_THRESHOLD) * (d2 - SYNERGY_D2_THRESHOLD)
+            return np.sqrt(raw_synergy) * SYNERGY_FACTOR * 100
+        return 0.0
+
+    base_df["Synergy_Bonus"] = base_df.apply(calc_synergy_bonus, axis=1)
+    base_df["EDI_Total"] = base_df["EDI_Total"] + base_df["Synergy_Bonus"]
+
+    synergy_count = (base_df["Synergy_Bonus"] > 0).sum()
+    if synergy_count > 0:
+        print(f"   协同效应加分: {synergy_count} 名球员获得加分")
+        top_synergy = base_df.nlargest(3, "Synergy_Bonus")[
+            ["PLAYER_NAME", "Synergy_Bonus"]
+        ]
+        for _, row in top_synergy.iterrows():
+            print(f"      {row['PLAYER_NAME']}: +{row['Synergy_Bonus']:.2f}")
 
     # 计算效率残差 (用于分析)
     base_df["Efficiency_Residual"] = (

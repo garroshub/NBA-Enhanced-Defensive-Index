@@ -1,5 +1,114 @@
 # NBA EDI 防守评估模型 - 开发日志
 
+## [V0.7] - 2026-01-17
+
+### 代码架构优化 + 3 分类位置系统 + Benchmark 框架
+
+本版本完成了重大的代码重构和架构优化，引入 3 分类位置系统解决 DPOY 评估中的角色归类问题，并新增官方指标基准评估框架。
+
+#### 1. 3 分类位置系统 (3-Category Role Classification)
+
+**问题背景:**
+- 原 2 分类系统 (Guards/Frontcourt) 无法正确处理"扫荡型内线" (Roamer)
+- JJJ 和 Giannis 等摇摆位置球员被错误归入传统 Frontcourt 与 Gobert 竞争
+
+**解决方案:**
+```python
+def classify_role_3cat(position, roamer_pct, threshold=0.15):
+    """3 分类：Backcourt, Roamer, Frontcourt"""
+    # 纯 G (PG, SG, G) -> Backcourt (永不为 Roamer)
+    # 纯 C -> Frontcourt (即使 Roamer_Pct 高也不变)
+    # 摇摆位置 (F, F-C, C-F, G-F, F-G) + Roamer_Pct >= 0.15 -> Roamer
+```
+
+**分类规则:**
+| 位置 | Roamer_Pct | 分类 | 示例 |
+|------|------------|------|------|
+| G, PG, SG | 任意 | Backcourt | Marcus Smart |
+| C | 任意 | Frontcourt | Rudy Gobert (即使 Roamer_Pct 高) |
+| F, F-C, C-F | >= 0.15 | Roamer | JJJ, Giannis |
+| F, PF, SF | < 0.15 | Frontcourt | 传统锋线 |
+
+#### 2. 代码架构优化
+
+**新增 `src/constants.py` 作为共享常量和函数的单一来源:**
+```python
+# 版本与评估赛季
+EDI_VERSION = "0.7"
+EVALUATION_SEASONS = ["2019-20", "2020-21", "2021-22", "2022-23", "2023-24"]
+
+# 优化后参数 (2025-01-17)
+ROAMER_THRESHOLD = 0.15
+SYNERGY_FACTOR = 0.5
+SYNERGY_D1_THRESHOLD = 0.80
+SYNERGY_D2_THRESHOLD = 0.75
+ROAMER_WEIGHT_REDIST_OUTPUT = 0.3
+
+# 共享函数
+classify_role_3cat()      # 3 分类位置函数
+bayesian_score()          # 贝叶斯收缩
+sigmoid_availability()    # Sigmoid 可用性
+```
+
+**删除冗余代码:**
+- 删除 `src/optimize_parameters.py` (与 tune_parameters.py 功能重复)
+- 从 `tune_parameters.py` 删除 `classify_role_with_roamer` (45 行)
+- 从 `benchmark_evaluation.py` 删除 `classify_position` (46 行)
+- 统一使用 `constants.py` 中的 `classify_role_3cat`
+
+#### 3. 新增 Benchmark 评估框架
+
+**`src/benchmark_evaluation.py`** - EDI vs NBA 官方指标对比:
+- 统一样本池 (GP >= 40, MPG >= 20)
+- 3 分类位置内排名
+- Spearman 秩相关计算
+
+**`src/fetch_external.py`** - 外部数据获取:
+- NBA 官方 API 数据 (DEF_RATING, DEF_WS)
+- 缓存机制避免重复请求
+
+**`src/tune_parameters.py`** - 参数优化器:
+- 1575 种参数组合搜索
+- 目标: 最小化 DPOY 平均排名 + 最大化 Recall@30
+
+#### 4. 评估结果 (3 分类)
+
+| 赛季 | DPOY | 分类 | EDI 排名 | DEF_RATING | DEF_WS |
+|------|------|------|----------|------------|--------|
+| 2019-20 | Giannis | Roamer | #2 | #1 | #1 |
+| 2020-21 | Gobert | Frontcourt | #1 ✅ | #1 | #1 |
+| 2021-22 | Smart | Backcourt | #4 | #7 | #2 |
+| 2022-23 | JJJ | Roamer | #13 | #2 | #7 |
+| 2023-24 | Gobert | Frontcourt | #1 ✅ | #1 | #1 |
+
+**汇总指标:**
+| 指标 | EDI | DEF_RATING | DEF_WS |
+|------|-----|------------|--------|
+| DPOY 平均排名 | 4.2 | 2.4 | 2.4 |
+| Recall@30 (5 赛季) | **32/50** ✅ | 23/50 | 29/50 |
+
+> EDI 在 Recall@30 上表现最佳，成功捕获最多 All-Defense 球员
+
+#### 5. 文件变更
+
+**新增文件:**
+- `src/constants.py` - 共享常量和函数
+- `src/benchmark_evaluation.py` - 基准评估框架
+- `src/fetch_external.py` - 外部数据获取
+- `src/tune_parameters.py` - 参数优化器
+- `reports/benchmark_edi_vs_official.md` - 评估报告
+- `docs/` - 文档目录
+
+**删除文件:**
+- `src/optimize_parameters.py` (功能合并到 tune_parameters.py)
+
+**修改文件:**
+- `src/nba_defense_mvp.py` - 优化参数
+- `data/*.csv` - 重新生成 5 个赛季数据
+- `figures/*.png` - 更新雷达图
+
+---
+
 ## [V0.65] - 2026-01-16
 
 ### 新增功能: Roamer 动态权重调整系统
