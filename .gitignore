@@ -1,4 +1,36 @@
+# --- Whitelist Strategy: Ignore everything by default ---
+*
+!*/
+
+# --- Keep Source Code ---
+!src/
+!src/*.py
+!web/
+!web/**/*
+
+# --- Keep Documentation & Specific Assets ---
+!README.md
+!AGENTS.md
+!reports/
+!reports/NBA_EDI_Defense_Report.md
+!figures/
+!figures/EDI_Summary.png
+
+# --- Keep Config Files ---
+!requirements.txt
+!.gitignore
+!.github/
+!.github/**/*
+
+# --- Ignore Specific Junk (Double Check) ---
+web/node_modules/
+web/.next/
+web/out/
+web/.env*
 __pycache__/
 *.pyc
-.ruff_cache/
+.DS_Store
 .venv/
+venv/
+env/
+data/

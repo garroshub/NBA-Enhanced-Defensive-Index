@@ -792,7 +792,7 @@ def analyze_season(target_season):
             "   WARNING: Not enough valid data for regression model. Using Actual as Expected."
         )
         base_df["Expected_Output"] = base_df["Actual_Output"]
-        # Dummy model for Hansen logic
+        # Create a dummy model for fallback predictions
         reg_model = LinearRegression()
         reg_model.intercept_ = 0
         reg_model.coef_ = np.array([1.0])
@@ -867,275 +867,6 @@ def analyze_season(target_season):
     print(
         f"\n   角色分布: Guards={len(base_df[base_df['ROLE'] == 'Guards'])}, Frontcourt={len(base_df[base_df['ROLE'] == 'Frontcourt'])}"
     )
-
-    # =============================================================================
-    # 2025-26 赛季特殊处理: 为 Hansen Yang 单独计算 EDI (忽略 GP 限制)
-    # =============================================================================
-    if target_season == "2025-26":
-        hansen_mask = d4_df["PLAYER_NAME"].str.contains("Hansen", case=False, na=False)
-        if (
-            hansen_mask.any()
-            and not base_df["PLAYER_NAME"]
-            .str.contains("Hansen", case=False, na=False)
-            .any()
-        ):
-            print("\n   [特殊处理] 为 Hansen Yang 计算 EDI (忽略 GP 限制)...")
-
-            # 获取 Hansen 的基础数据
-            hansen_base = (
-                d4_df[hansen_mask]
-                .copy()[["PLAYER_ID", "PLAYER_NAME", "GP", "MIN", "PF", "STL", "BLK"]]
-                .iloc[0:1]
-            )
-
-            # 获取位置信息
-            hansen_id = hansen_base["PLAYER_ID"].values[0]
-            hansen_base["PLAYER_POSITION"] = "F"  # 前锋
-            hansen_base["ROLE"] = "Frontcourt"
-
-            # D4: Defensive IQ
-            hansen_base["Stocks"] = hansen_base["STL"] + hansen_base["BLK"]
-            hansen_base["D4_Ratio"] = hansen_base["Stocks"] / (hansen_base["PF"] + 1)
-            # 使用联盟排名计算百分位
-            all_d4_ratios = d4_df["STL"] + d4_df["BLK"]
-            all_d4_ratios = all_d4_ratios / (d4_df["PF"] + 1)
-            hansen_d4_raw = (all_d4_ratios < hansen_base["D4_Ratio"].values[0]).mean()
-            hansen_d4_n = hansen_base["MIN"].values[0] * hansen_base["GP"].values[0]
-            hansen_base["D4_Score"] = (hansen_d4_n * hansen_d4_raw + C * 0.5) / (
-                hansen_d4_n + C
-            )
-            hansen_base["W4"] = hansen_d4_n / (hansen_d4_n + C)
-
-            # D1: Shot Suppression (Value Added + MD Adjustment)
-            if not d1_df.empty and hansen_id in d1_df["PLAYER_ID"].values:
-                hansen_d1 = d1_df[d1_df["PLAYER_ID"] == hansen_id].iloc[0]
-                hansen_dfg = hansen_d1["D_FG_PCT"]
-                hansen_dfga = hansen_d1["D_FGA"]
-                hansen_pct_plusminus = hansen_d1["PCT_PLUSMINUS"]
-
-                # Get Hansen's MD (if available)
-                hansen_md_zscore = 0.0  # Default neutral
-                if not md_df.empty and hansen_id in md_df["PLAYER_ID"].values:
-                    hansen_md_row = md_df[md_df["PLAYER_ID"] == hansen_id].iloc[0]
-                    hansen_md_zscore = hansen_md_row["MD_Zscore"]
-                    hansen_base["MATCHUP_DIFFICULTY"] = hansen_md_row[
-                        "MATCHUP_DIFFICULTY"
-                    ]
-                    hansen_base["MD_Zscore"] = hansen_md_zscore
-                    hansen_base["MD_Percentile"] = hansen_md_row["MD_Percentile"]
-                else:
-                    hansen_base["MATCHUP_DIFFICULTY"] = 24.0
-                    hansen_base["MD_Zscore"] = 0.0
-                    hansen_base["MD_Percentile"] = 0.5
-
-                # Apply MD adjustment: Adjusted_VA = PCT_PLUSMINUS * (1 + k * MD_Zscore)
-                MD_K = 0.3
-                hansen_pct_plusminus_adj = hansen_pct_plusminus * (
-                    1 + MD_K * hansen_md_zscore
-                )
-
-                # Use adjusted PCT_PLUSMINUS to calculate percentile
-                # Calculate adjusted VA for all players in d1_df for comparison
-                if not md_df.empty:
-                    d1_with_md = d1_df.merge(
-                        md_df[["PLAYER_ID", "MD_Zscore"]], on="PLAYER_ID", how="left"
-                    )
-                    d1_with_md["MD_Zscore"] = d1_with_md["MD_Zscore"].fillna(0)
-                    d1_with_md["PCT_PLUSMINUS_ADJ"] = d1_with_md["PCT_PLUSMINUS"] * (
-                        1 + MD_K * d1_with_md["MD_Zscore"]
-                    )
-                    hansen_d1_raw = (
-                        1
-                        - (
-                            d1_with_md["PCT_PLUSMINUS_ADJ"] < hansen_pct_plusminus_adj
-                        ).mean()
-                    )
-                else:
-                    hansen_d1_raw = (
-                        1 - (d1_df["PCT_PLUSMINUS"] < hansen_pct_plusminus).mean()
-                    )
-
-                hansen_d1_n = hansen_dfga * hansen_base["GP"].values[0]
-                hansen_base["D1_Score"] = (hansen_d1_n * hansen_d1_raw + C * 0.5) / (
-                    hansen_d1_n + C
-                )
-                hansen_base["W1"] = hansen_d1_n / (hansen_d1_n + C)
-                hansen_base["D_FG_PCT"] = hansen_dfg
-                hansen_base["PCT_PLUSMINUS"] = hansen_pct_plusminus
-                hansen_base["PCT_PLUSMINUS_ADJ"] = hansen_pct_plusminus_adj
-            else:
-                hansen_base["D1_Score"] = 0.5
-                hansen_base["W1"] = 0.0
-                hansen_base["D_FG_PCT"] = np.nan
-                hansen_base["PCT_PLUSMINUS"] = np.nan
-                hansen_base["PCT_PLUSMINUS_ADJ"] = np.nan
-                hansen_base["MATCHUP_DIFFICULTY"] = 24.0
-                hansen_base["MD_Zscore"] = 0.0
-                hansen_base["MD_Percentile"] = 0.5
-
-            # D2: Rim + 3PT (Frontcourt weights: 内线60% / 外线40%) - Value Added
-            hansen_rim_raw, hansen_3pt_raw = 0.5, 0.5
-            hansen_rim_fga, hansen_3pt_fga = 0, 0
-
-            if not d2_rim_df.empty and hansen_id in d2_rim_df["PLAYER_ID"].values:
-                hansen_rim = d2_rim_df[d2_rim_df["PLAYER_ID"] == hansen_id].iloc[0]
-                hansen_rim_dfg = hansen_rim["D_FG_PCT"]
-                hansen_rim_plusminus = hansen_rim["PLUSMINUS"]
-                # Value Added: PLUSMINUS 越负越好
-                hansen_rim_raw = (
-                    1 - (d2_rim_df["PLUSMINUS"] < hansen_rim_plusminus).mean()
-                )
-                hansen_rim_fga = hansen_rim.get("LT_06_FGA", 0)
-                hansen_base["Rim_DFG"] = hansen_rim_dfg
-                hansen_base["Rim_PLUSMINUS"] = hansen_rim_plusminus
-
-            if not d2_3pt_df.empty and hansen_id in d2_3pt_df["PLAYER_ID"].values:
-                hansen_3pt = d2_3pt_df[d2_3pt_df["PLAYER_ID"] == hansen_id].iloc[0]
-                hansen_3pt_dfg = hansen_3pt["D_FG_PCT"]
-                hansen_3pt_plusminus = hansen_3pt["PLUSMINUS"]
-                # Value Added: PLUSMINUS 越负越好
-                hansen_3pt_raw = (
-                    1 - (d2_3pt_df["PLUSMINUS"] < hansen_3pt_plusminus).mean()
-                )
-                hansen_3pt_fga = hansen_3pt.get("FG3A", 0)
-                hansen_base["3PT_DFG"] = hansen_3pt_dfg
-                hansen_base["3PT_PLUSMINUS"] = hansen_3pt_plusminus
-
-            # Frontcourt: 内线60% / 外线40%
-            hansen_d2_raw = hansen_rim_raw * 0.6 + hansen_3pt_raw * 0.4
-            hansen_d2_n = (hansen_rim_fga * 0.6 + hansen_3pt_fga * 0.4) * hansen_base[
-                "GP"
-            ].values[0]
-            hansen_base["D2_Score"] = (hansen_d2_n * hansen_d2_raw + C * 0.5) / (
-                hansen_d2_n + C
-            )
-            hansen_base["W2"] = hansen_d2_n / (hansen_d2_n + C)
-
-            # D3: Hustle Index
-            if not d3_df.empty and hansen_id in d3_df["PLAYER_ID"].values:
-                hansen_d3 = d3_df[d3_df["PLAYER_ID"] == hansen_id].iloc[0]
-                defl = hansen_d3.get("DEFLECTIONS", 0)
-                chrg = hansen_d3.get("CHARGES_DRAWN", 0)
-                cont = hansen_d3.get("CONTESTED_SHOTS", 0)
-
-                # 计算 Z-score 相对于联盟
-                z_defl = (defl - d3_df["DEFLECTIONS"].mean()) / d3_df[
-                    "DEFLECTIONS"
-                ].std()
-                z_chrg = (chrg - d3_df["CHARGES_DRAWN"].mean()) / d3_df[
-                    "CHARGES_DRAWN"
-                ].std()
-                z_cont = (cont - d3_df["CONTESTED_SHOTS"].mean()) / d3_df[
-                    "CONTESTED_SHOTS"
-                ].std()
-                hansen_hustle = z_defl + z_chrg * 2 + z_cont
-
-                # 计算百分位
-                all_hustle = (
-                    d3_df["DEFLECTIONS"] - d3_df["DEFLECTIONS"].mean()
-                ) / d3_df["DEFLECTIONS"].std()
-                all_hustle += (
-                    (d3_df["CHARGES_DRAWN"] - d3_df["CHARGES_DRAWN"].mean())
-                    / d3_df["CHARGES_DRAWN"].std()
-                    * 2
-                )
-                all_hustle += (
-                    d3_df["CONTESTED_SHOTS"] - d3_df["CONTESTED_SHOTS"].mean()
-                ) / d3_df["CONTESTED_SHOTS"].std()
-                hansen_d3_raw = (all_hustle < hansen_hustle).mean()
-                hansen_d3_n = hansen_base["MIN"].values[0] * hansen_base["GP"].values[0]
-                hansen_base["D3_Score"] = (hansen_d3_n * hansen_d3_raw + C * 0.5) / (
-                    hansen_d3_n + C
-                )
-                hansen_base["W3"] = hansen_d3_n / (hansen_d3_n + C)
-                hansen_base["DEFLECTIONS"] = defl
-            else:
-                hansen_base["D3_Score"] = 0.5
-                hansen_base["W3"] = 0.0
-
-            # D5: DREB%
-            if not d5_adv_df.empty and hansen_id in d5_adv_df["PLAYER_ID"].values:
-                hansen_dreb = d5_adv_df[d5_adv_df["PLAYER_ID"] == hansen_id][
-                    "DREB_PCT"
-                ].values[0]
-                hansen_d5_raw = (d5_adv_df["DREB_PCT"] < hansen_dreb).mean()
-                hansen_d5_n = hansen_base["MIN"].values[0] * hansen_base["GP"].values[0]
-                hansen_base["D5_Score"] = (hansen_d5_n * hansen_d5_raw + C * 0.5) / (
-                    hansen_d5_n + C
-                )
-                hansen_base["W5"] = hansen_d5_n / (hansen_d5_n + C)  # Frontcourt: 1.0
-                hansen_base["DREB_PCT"] = hansen_dreb
-            else:
-                hansen_base["D5_Score"] = 0.5
-                hansen_base["W5"] = 0.0
-                hansen_base["DREB_PCT"] = np.nan
-
-            # 计算 EDI_Total (使用效率模型框架)
-            # Step 1: 计算实际产出 (Actual Output)
-            hansen_w1 = hansen_base["W1"].values[0]
-            hansen_w2 = hansen_base["W2"].values[0]
-            hansen_w3 = hansen_base["W3"].values[0]
-            hansen_w4 = hansen_base["W4"].values[0]
-            hansen_w5 = hansen_base["W5"].values[0]
-
-            hansen_d1 = hansen_base["D1_Score"].values[0]
-            hansen_d2 = hansen_base["D2_Score"].values[0]
-            hansen_d3 = hansen_base["D3_Score"].values[0]
-            hansen_d4 = hansen_base["D4_Score"].values[0]
-            hansen_d5 = hansen_base["D5_Score"].values[0]
-
-            hansen_actual_output = (hansen_d1 * hansen_w1 + hansen_d2 * hansen_w2) / (
-                hansen_w1 + hansen_w2 + 1e-6
-            )
-            hansen_base["Actual_Output"] = hansen_actual_output
-
-            # Step 2: 计算投入分 (Input Score)
-            hansen_input_score = (hansen_d3 * hansen_w3 + hansen_d4 * hansen_w4) / (
-                hansen_w3 + hansen_w4 + 1e-6
-            )
-            hansen_base["Input_Score"] = hansen_input_score
-
-            # Step 3: 用已拟合的回归模型预测预期产出
-            if valid_mask.sum() > 10:
-                hansen_expected_output = reg_model.predict([[hansen_input_score]])[0]
-            else:
-                hansen_expected_output = hansen_actual_output
-
-            hansen_base["Expected_Output"] = hansen_expected_output
-
-            # Step 4: 计算效率系数 (限制在 [0.5, 1.5] 范围)
-            hansen_efficiency = hansen_actual_output / (hansen_expected_output + 1e-6)
-            hansen_efficiency = np.clip(hansen_efficiency, 0.5, 1.5)
-            hansen_base["Efficiency"] = hansen_efficiency
-
-            # Step 5: 计算效率残差
-            hansen_base["Efficiency_Residual"] = (
-                hansen_actual_output - hansen_expected_output
-            )
-
-            # Step 6: 计算 EDI (使用效率模型公式)
-            output_weighted = (
-                hansen_actual_output * hansen_efficiency * (hansen_w1 + hansen_w2)
-            )
-            input_weighted = hansen_input_score * (hansen_w3 + hansen_w4)
-            d5_weighted = hansen_d5 * hansen_w5
-
-            total_weight = hansen_w1 + hansen_w2 + hansen_w3 + hansen_w4 + hansen_w5
-            hansen_base["EDI_Total"] = (
-                (output_weighted + input_weighted + d5_weighted) / total_weight * 100
-                if total_weight > 0
-                else 50.0
-            )
-
-            print(
-                f"   Hansen 效率模型: Input={hansen_input_score:.3f}, Expected={hansen_expected_output:.3f}, Actual={hansen_actual_output:.3f}, Efficiency={hansen_efficiency:.3f}"
-            )
-
-            # 添加到 base_df
-            base_df = pd.concat([base_df, hansen_base], ignore_index=True)
-            print(
-                f"   Hansen Yang EDI: {hansen_base['EDI_Total'].values[0]:.2f} (GP={hansen_base['GP'].values[0]})"
-            )
 
     return base_df
 
@@ -1613,17 +1344,7 @@ if __name__ == "__main__":
                 extra_player="Stephen Curry",
                 extra_label="Curry",
             )
-            # 前场 Top 5 + Hansen Yang (仅 2025-26 赛季)
-            if SEASON == "2025-26":
-                print_top_n(
-                    frontcourt,
-                    "前场 (Frontcourt)",
-                    n=5,
-                    extra_player="Hansen",
-                    extra_label="Hansen Yang",
-                )
-            else:
-                print_top_n(frontcourt, "前场 (Frontcourt)", n=5)
+            print_top_n(frontcourt, "前场 (Frontcourt)", n=5)
 
             # Save all data to CSV
             base_df.to_csv(
@@ -1695,40 +1416,17 @@ if __name__ == "__main__":
                 f"后卫 Top 5 防守能力画像{curry_note}",
             )
 
-            # 前场 Top 5 单独雷达图 (2025-26 赛季包含 Hansen Yang)
+            # 前场 Top 5 单独雷达图
             # 使用 Frontcourt (ROLE == "Frontcourt"，包含F和C)
             frontcourt_sorted = base_df[base_df["ROLE"] == "Frontcourt"].sort_values(
                 "EDI_Total", ascending=False
             )
             frontcourt_top5 = frontcourt_sorted.head(5)
-            frontcourt_total = len(frontcourt_sorted)
-
-            # 2025-26 赛季添加 Hansen Yang (如果不在 Top 5 中)
-            hansen_note = ""
-            if SEASON == "2025-26":
-                hansen_mask = frontcourt_sorted["PLAYER_NAME"].str.contains(
-                    "Hansen", case=False, na=False
-                )
-                if hansen_mask.any():
-                    hansen_row = frontcourt_sorted[hansen_mask].iloc[0:1]
-                    if (
-                        not frontcourt_top5["PLAYER_NAME"]
-                        .str.contains("Hansen", case=False, na=False)
-                        .any()
-                    ):
-                        hansen_rank = (
-                            frontcourt_sorted["EDI_Total"]
-                            > hansen_row["EDI_Total"].values[0]
-                        ).sum() + 1
-                        frontcourt_top5 = pd.concat([frontcourt_top5, hansen_row])
-                        hansen_note = f" (含Hansen #{hansen_rank}/{frontcourt_total})"
-                else:
-                    hansen_note = " (Hansen未找到)"
 
             create_individual_radar_charts(
                 frontcourt_top5,
                 FIGURES_DIR / f"nba_defense_frontcourt_top5_{SEASON}.png",
-                f"前场 Top 5 防守能力画像{hansen_note}",
+                "前场 Top 5 防守能力画像",
             )
 
             print("\n[完成] 分析结束!")
