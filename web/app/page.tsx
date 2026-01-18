@@ -1,4 +1,4 @@
-import { getPlayers, getSeasons } from '@/lib/data';
+import { getPlayers, getSeasons, getMeta, getSeasonInfo } from '@/lib/data';
 import Dashboard from '@/components/Dashboard';
 import { Shield } from 'lucide-react';
 import Link from 'next/link';
@@ -6,10 +6,16 @@ import Link from 'next/link';
 export default function Home() {
   const seasons = getSeasons();
   const currentSeason = seasons[0];
+  const meta = getMeta();
   
   const allData: Record<string, any[]> = {};
+  const seasonInfoMap: Record<string, { max_games_played: number }> = {};
   for (const season of seasons) {
     allData[season] = getPlayers(season);
+    const info = getSeasonInfo(season);
+    if (info) {
+      seasonInfoMap[season] = { max_games_played: info.max_games_played };
+    }
   }
 
   return (
@@ -39,7 +45,9 @@ export default function Home() {
         <Dashboard 
           initialSeason={currentSeason} 
           seasons={seasons} 
-          allData={allData} 
+          allData={allData}
+          generatedAt={meta.generated_at}
+          seasonInfoMap={seasonInfoMap}
         />
       </div>
     </main>

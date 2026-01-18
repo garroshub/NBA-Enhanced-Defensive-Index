@@ -27,6 +27,37 @@ We present the **Enhanced Defensive Index (EDI)**, a novel framework for evaluat
 
 We employ **Bayesian shrinkage** to mitigate small sample bias and an **Efficiency Model** to distinguish effort from impact. Results demonstrate that EDI achieves parity with leading advanced metrics while offering superior interpretability.
 
+---
+
+## Model Highlights
+
+What makes EDI different from traditional defensive metrics:
+
+| Principle | Description |
+|-----------|-------------|
+| **Mechanism-first** | Defense modeled as 5 interpretable dimensions, not a single residual-based number |
+| **Bayesian & Uncertainty-aware** | Posterior inference and shrinkage for stability in small samples |
+| **Diagnosis over Ranking** | Explains *why* defensive impact emerges, not just ordering by score |
+| **Role-aware** | Maps defensive value through roles (Guards vs Frontcourt) and efficiency |
+
+---
+
+## Validation
+
+EDI was validated against NBA official metrics across 5 seasons (2019-2024):
+
+**All-Defensive Team Coverage**
+
+| Metric | Top 10 | Top 20 | Top 30 |
+|--------|--------|--------|--------|
+| **EDI** | **19/50** | **25/50** | **32/50** |
+| DEF_RATING | 1/50 | 1/50 | 3/50 |
+| DEF_WS | 1/50 | 3/50 | 4/50 |
+
+EDI identifies **10x more** All-Defensive Team players than official metrics.
+
+---
+
 ## Repository Structure
 
 *   `src/`: Python implementation of the EDI model and data pipeline.

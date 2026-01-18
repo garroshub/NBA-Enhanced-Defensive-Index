@@ -22,3 +22,18 @@ export function getPlayerById(id: number, season: string = '2025-26'): Player | 
   const players = getPlayers(season);
   return players.find(p => p.id === id);
 }
+
+export function getMeta() {
+  return data.meta;
+}
+
+export function getSeasonInfo(season: string) {
+  const key = `${season}_info`;
+  return data.meta[key] as {
+    total_players: number;
+    max_games_played: number;
+    season_progress: number;
+    dynamic_c: number;
+    is_current: boolean;
+  } | undefined;
+}
