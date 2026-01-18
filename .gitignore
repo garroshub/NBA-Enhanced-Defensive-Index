@@ -33,4 +33,8 @@ __pycache__/
 .venv/
 venv/
 env/
-data/
+
+# --- Whitelist Data ---
+!data/
+!data/*.csv
+!web/public/data.json

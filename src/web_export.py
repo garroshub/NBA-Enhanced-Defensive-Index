@@ -632,7 +632,21 @@ def main():
     data = generate_all_data(current_only=current_only)
 
     # Save to file
-    output_path = save_data(data)
+    if len(data["seasons"]) > 0:
+        # Check if any season has 0 players
+        valid_data = True
+        for season, players in data["seasons"].items():
+            if len(players) == 0:
+                print(f"Error: Season {season} has 0 players! Aborting save.")
+                valid_data = False
+                break
+
+        if valid_data:
+            output_path = save_data(data)
+        else:
+            print("Export aborted due to empty data.")
+    else:
+        print("Error: No seasons generated! Aborting save.")
 
     # Summary
     print("\n" + "=" * 60)
