@@ -33,7 +33,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 
 # Path configuration
 BASE_DIR = Path(__file__).resolve().parent.parent
-WEB_DATA_DIR = BASE_DIR / "web" / "public"
+WEB_DATA_DIR = BASE_DIR / "web" / "lib"
 EXISTING_DATA_PATH = WEB_DATA_DIR / "data.json"
 
 # Season configuration

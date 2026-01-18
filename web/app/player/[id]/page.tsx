@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { ArrowLeft, Shield, Activity, Target, Brain, Anchor, Zap } from 'lucide-react';
 
 // Generate static params for all players across all seasons
-export async function generateStaticParams() {
+export function generateStaticParams() {
   try {
-    const seasons = await getSeasons();
+    const seasons = getSeasons();
     const allPlayerIds = new Set<string>();
 
     for (const season of seasons) {
-      const players = await getPlayers(season);
+      const players = getPlayers(season);
       players.forEach(p => allPlayerIds.add(p.id.toString()));
     }
 
@@ -34,8 +34,8 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function PlayerPage({ params }: { params: { id: string } }) {
-  const player = await getPlayerById(parseInt(params.id));
+export default function PlayerPage({ params }: { params: { id: string } }) {
+  const player = getPlayerById(parseInt(params.id));
 
   if (!player) {
     return (

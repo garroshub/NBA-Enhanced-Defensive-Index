@@ -1,27 +1,24 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { DataFile, Player } from './types';
+import rawData from './data.json';
 
-export async function getData(): Promise<DataFile> {
-  // This works on server side (build time)
-  const filePath = path.join(process.cwd(), 'public', 'data.json');
-  const fileContents = await fs.readFile(filePath, 'utf8');
-  return JSON.parse(fileContents);
+// Bundled data - imported at build time, guaranteed to exist
+const data: DataFile = rawData as DataFile;
+
+export function getData(): DataFile {
+  return data;
 }
 
-export async function getSeasons(): Promise<string[]> {
-  const data = await getData();
+export function getSeasons(): string[] {
   return Object.keys(data.seasons).sort().reverse();
 }
 
-export async function getPlayers(season?: string): Promise<Player[]> {
-  const data = await getData();
+export function getPlayers(season?: string): Player[] {
   const seasons = Object.keys(data.seasons).sort().reverse();
   const targetSeason = season || seasons[0];
   return data.seasons[targetSeason] || [];
 }
 
-export async function getPlayerById(id: number, season: string = '2025-26'): Promise<Player | undefined> {
-  const players = await getPlayers(season);
+export function getPlayerById(id: number, season: string = '2025-26'): Player | undefined {
+  const players = getPlayers(season);
   return players.find(p => p.id === id);
 }

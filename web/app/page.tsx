@@ -3,13 +3,13 @@ import Dashboard from '@/components/Dashboard';
 import { Shield } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function Home() {
-  const seasons = await getSeasons();
+export default function Home() {
+  const seasons = getSeasons();
   const currentSeason = seasons[0];
   
   const allData: Record<string, any[]> = {};
   for (const season of seasons) {
-    allData[season] = await getPlayers(season);
+    allData[season] = getPlayers(season);
   }
 
   return (
