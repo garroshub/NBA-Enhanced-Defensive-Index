@@ -64,12 +64,11 @@ EDI identifies **10x more** All-Defensive Team players than official metrics.
 *   `web/`: Next.js frontend for the interactive dashboard.
 *   `reports/`: Technical documentation and validation studies.
 
-## Automation
+## Updates
 
-This repository is self-updating. A GitHub Action runs daily to:
-1.  Fetch the latest NBA tracking data.
-2.  Recalculate EDI scores using the Bayesian model.
-3.  Rebuild and deploy the dashboard to GitHub Pages.
+This repository is updated weekly with the latest NBA tracking data. Each update includes:
+1.  Recalculated EDI scores using the Bayesian model.
+2.  Rebuilt and deployed dashboard to GitHub Pages.
 
 ---
 
