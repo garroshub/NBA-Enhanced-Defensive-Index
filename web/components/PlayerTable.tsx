@@ -102,7 +102,7 @@ export default function PlayerTable({ players, season }: PlayerTableProps) {
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-gray-400 uppercase bg-gray-900/80 border-b border-gray-800">
             <tr>
-              <th className="px-4 py-3 font-medium">Rank</th>
+              <th className="px-4 py-3 font-medium">EDI Rank</th>
               <th className="px-4 py-3 font-medium">Player</th>
               <th 
                 className="px-4 py-3 font-medium cursor-pointer hover:text-emerald-400 transition-colors"
@@ -161,7 +161,7 @@ export default function PlayerTable({ players, season }: PlayerTableProps) {
                 className="hover:bg-gray-800/50 transition-colors group"
               >
                 <td className="px-4 py-3 font-medium text-gray-500">
-                  #{idx + 1}
+                  #{player.ranks.overall}
                 </td>
                 <td className="px-4 py-3">
                   <Link href={`/player/${player.id}?season=${season}`} className="flex flex-col">
