@@ -73,4 +73,16 @@ This repository is self-updating. A GitHub Action runs daily to:
 
 ---
 
+## Star History
+
+<a href="https://star-history.com/#garroshub/NBA-Defensive-Index&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=garroshub/NBA-Defensive-Index&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=garroshub/NBA-Defensive-Index&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=garroshub/NBA-Defensive-Index&type=Date" />
+ </picture>
+</a>
+
+---
+
 *Academic Project | Not affiliated with the NBA*
