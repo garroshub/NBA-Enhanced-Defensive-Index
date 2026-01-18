@@ -1,13 +1,20 @@
-import { getPlayerById, getPlayers } from '@/lib/data';
+import { getPlayerById, getPlayers, getSeasons } from '@/lib/data';
 import RadarChart from '@/components/RadarChart';
 import Link from 'next/link';
 import { ArrowLeft, Shield, Activity, Target, Brain, Anchor, Zap } from 'lucide-react';
 
-// Generate static params for all players
+// Generate static params for all players across all seasons
 export async function generateStaticParams() {
-  const players = await getPlayers('2025-26');
-  return players.map((player) => ({
-    id: player.id.toString(),
+  const seasons = await getSeasons();
+  const allPlayerIds = new Set<string>();
+
+  for (const season of seasons) {
+    const players = await getPlayers(season);
+    players.forEach(p => allPlayerIds.add(p.id.toString()));
+  }
+
+  return Array.from(allPlayerIds).map((id) => ({
+    id: id,
   }));
 }
 
