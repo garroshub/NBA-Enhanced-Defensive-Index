@@ -10,6 +10,7 @@
 
 # --- Keep Documentation & Specific Assets ---
 !README.md
+!LICENSE
 !AGENTS.md
 !reports/
 !reports/NBA_EDI_Defense_Report.md
