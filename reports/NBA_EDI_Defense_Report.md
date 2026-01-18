@@ -1,6 +1,6 @@
 # The EDI Framework: A Bayesian Approach to Quantifying NBA Defensive Impact
 
-**Technical Report | Version 2.4**
+**Technical Report | Dr. Garros Gong**
 
 ---
 
