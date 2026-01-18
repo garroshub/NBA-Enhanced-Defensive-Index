@@ -5,17 +5,33 @@ import { ArrowLeft, Shield, Activity, Target, Brain, Anchor, Zap } from 'lucide-
 
 // Generate static params for all players across all seasons
 export async function generateStaticParams() {
-  const seasons = await getSeasons();
-  const allPlayerIds = new Set<string>();
+  try {
+    const seasons = await getSeasons();
+    const allPlayerIds = new Set<string>();
 
-  for (const season of seasons) {
-    const players = await getPlayers(season);
-    players.forEach(p => allPlayerIds.add(p.id.toString()));
+    for (const season of seasons) {
+      const players = await getPlayers(season);
+      players.forEach(p => allPlayerIds.add(p.id.toString()));
+    }
+
+    const params = Array.from(allPlayerIds).map((id) => ({
+      id: id,
+    }));
+
+    // If no data is available (e.g. during initial build before data generation),
+    // return a dummy path to satisfy Next.js 'output: export' requirement.
+    // This page will render the "Player Not Found" state.
+    if (params.length === 0) {
+      console.warn('No player data found during build. Generating fallback path.');
+      return [{ id: '0' }];
+    }
+
+    return params;
+  } catch (error) {
+    console.error('Error in generateStaticParams:', error);
+    // Fallback on error as well
+    return [{ id: '0' }];
   }
-
-  return Array.from(allPlayerIds).map((id) => ({
-    id: id,
-  }));
 }
 
 export default async function PlayerPage({ params }: { params: { id: string } }) {
