@@ -52,6 +52,12 @@ export interface SeasonData {
 }
 
 export interface DataFile {
-  metadata: SeasonMetadata; // Note: The current JSON structure might have metadata inside seasons or separate. Let's check.
+  meta: {
+    generated_at: string;
+    current_season: string;
+    available_seasons: string[];
+    model_version: string;
+    [key: string]: any; // Allow for season_info keys
+  };
   seasons: SeasonData;
 }

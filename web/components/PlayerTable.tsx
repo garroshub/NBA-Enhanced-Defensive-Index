@@ -13,16 +13,18 @@ function cn(...inputs: ClassValue[]) {
 
 interface PlayerTableProps {
   players: Player[];
+  season: string;
 }
 
 type SortField = 'edi' | 'd1' | 'd2' | 'd3' | 'd4' | 'd5' | 'efficiency' | 'gp';
 type SortDirection = 'asc' | 'desc';
 
-export default function PlayerTable({ players }: PlayerTableProps) {
+export default function PlayerTable({ players, season }: PlayerTableProps) {
   const [sortField, setSortField] = useState<SortField>('edi');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const isCurrentSeason = season === '2025-26'; // TODO: Make this dynamic based on metadata
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -111,7 +113,9 @@ export default function PlayerTable({ players }: PlayerTableProps) {
                   <ArrowUpDown className="w-3 h-3" />
                 </div>
               </th>
-              <th className="px-4 py-3 font-medium text-center">Trend</th>
+              {isCurrentSeason && (
+                <th className="px-4 py-3 font-medium text-center">Trend</th>
+              )}
               <th 
                 className="px-4 py-3 font-medium cursor-pointer hover:text-emerald-400 transition-colors text-right"
                 onClick={() => handleSort('d1')}
@@ -160,7 +164,7 @@ export default function PlayerTable({ players }: PlayerTableProps) {
                   #{player.ranks.overall}
                 </td>
                 <td className="px-4 py-3">
-                  <Link href={`/player/${player.id}`} className="flex flex-col">
+                  <Link href={`/player/${player.id}?season=${season}`} className="flex flex-col">
                     <span className="font-medium text-gray-200 group-hover:text-emerald-400 transition-colors">
                       {player.name}
                     </span>
@@ -172,19 +176,21 @@ export default function PlayerTable({ players }: PlayerTableProps) {
                 <td className="px-4 py-3 font-bold text-emerald-400 text-base">
                   {player.scores.edi.toFixed(1)}
                 </td>
-                <td className="px-4 py-3 text-center">
-                  <div className="flex justify-center items-center gap-1">
-                    {getTrendIcon(player.trend)}
-                    {player.trend?.edi_change && (
-                      <span className={cn(
-                        "text-xs",
-                        player.trend.edi_change > 0 ? "text-emerald-500" : "text-red-500"
-                      )}>
-                        {Math.abs(player.trend.edi_change).toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                </td>
+                {isCurrentSeason && (
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex justify-center items-center gap-1">
+                      {getTrendIcon(player.trend)}
+                      {player.trend?.edi_change && (
+                        <span className={cn(
+                          "text-xs",
+                          player.trend.edi_change > 0 ? "text-emerald-500" : "text-red-500"
+                        )}>
+                          {Math.abs(player.trend.edi_change).toFixed(1)}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                )}
                 {['d1', 'd2', 'd3', 'd4', 'd5'].map((key) => {
                   const scoreKey = key as keyof PlayerScores;
                   return (

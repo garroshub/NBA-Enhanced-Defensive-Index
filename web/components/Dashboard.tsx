@@ -15,6 +15,8 @@ export default function Dashboard({ initialSeason, seasons, allData }: Dashboard
   const [currentSeason, setCurrentSeason] = useState(initialSeason);
   const players = allData[currentSeason] || [];
 
+  const isCurrentSeason = currentSeason === seasons[0];
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -40,12 +42,12 @@ export default function Dashboard({ initialSeason, seasons, allData }: Dashboard
         <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
           <div className="text-sm text-gray-500">Status</div>
           <div className="text-xl font-semibold text-white">
-            {currentSeason === seasons[0] ? 'In Progress' : 'Final'}
+            {isCurrentSeason ? 'In Progress' : 'Final'}
           </div>
         </div>
       </div>
 
-      <PlayerTable players={players} />
+      <PlayerTable players={players} season={currentSeason} isCurrentSeason={isCurrentSeason} />
     </div>
   );
 }
