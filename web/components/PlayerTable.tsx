@@ -161,7 +161,7 @@ export default function PlayerTable({ players, season }: PlayerTableProps) {
                 className="hover:bg-gray-800/50 transition-colors group"
               >
                 <td className="px-4 py-3 font-medium text-gray-500">
-                  #{player.ranks.overall}
+                  #{idx + 1}
                 </td>
                 <td className="px-4 py-3">
                   <Link href={`/player/${player.id}?season=${season}`} className="flex flex-col">

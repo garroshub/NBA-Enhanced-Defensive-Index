@@ -25,7 +25,7 @@
       "is_current": false
     },
     "2022-23_info": {
-      "total_players": 302,
+      "total_players": 295,
       "max_games_played": 83,
       "season_progress": 1.0,
       "dynamic_c": 60.0,
@@ -2964,7 +2964,7 @@
       },
       {
         "id": 203994,
-        "name": "Jusuf Nurkić",
+        "name": "Jusuf Nurki\u0107",
         "team": "UTA",
         "position": "C",
         "role": "Frontcourt",
@@ -3677,7 +3677,7 @@
       },
       {
         "id": 1642864,
-        "name": "Hugo González",
+        "name": "Hugo Gonz\u00e1lez",
         "team": "BOS",
         "position": "G",
         "role": "Guards",
@@ -4080,7 +4080,7 @@
       },
       {
         "id": 1629029,
-        "name": "Luka Dončić",
+        "name": "Luka Don\u010di\u0107",
         "team": "LAL",
         "position": "F-G",
         "role": "Frontcourt",
@@ -4514,7 +4514,7 @@
       },
       {
         "id": 203999,
-        "name": "Nikola Jokić",
+        "name": "Nikola Joki\u0107",
         "team": "DEN",
         "position": "C",
         "role": "Frontcourt",
@@ -4669,7 +4669,7 @@
       },
       {
         "id": 1631217,
-        "name": "Moussa Diabaté",
+        "name": "Moussa Diabat\u00e9",
         "team": "CHA",
         "position": "F",
         "role": "Frontcourt",
@@ -4793,7 +4793,7 @@
       },
       {
         "id": 202696,
-        "name": "Nikola Vučević",
+        "name": "Nikola Vu\u010devi\u0107",
         "team": "CHI",
         "position": "C",
         "role": "Frontcourt",
@@ -4917,7 +4917,7 @@
       },
       {
         "id": 1631107,
-        "name": "Nikola Jović",
+        "name": "Nikola Jovi\u0107",
         "team": "MIA",
         "position": "F",
         "role": "Frontcourt",
@@ -6250,7 +6250,7 @@
       },
       {
         "id": 203471,
-        "name": "Dennis Schröder",
+        "name": "Dennis Schr\u00f6der",
         "team": "SAC",
         "position": "G",
         "role": "Guards",
@@ -6560,7 +6560,7 @@
       },
       {
         "id": 1642856,
-        "name": "Egor Dëmin",
+        "name": "Egor D\u00ebmin",
         "team": "BKN",
         "position": "G",
         "role": "Guards",
@@ -7273,7 +7273,7 @@
       },
       {
         "id": 1642275,
-        "name": "Tidjane Salaün",
+        "name": "Tidjane Sala\u00fcn",
         "team": "CHA",
         "position": "F",
         "role": "Frontcourt",
@@ -8234,7 +8234,7 @@
       },
       {
         "id": 1630249,
-        "name": "Vít Krejčí",
+        "name": "V\u00edt Krej\u010d\u00ed",
         "team": "ATL",
         "position": "G",
         "role": "Guards",
@@ -8930,7 +8930,7 @@
       },
       {
         "id": 203994,
-        "name": "Jusuf Nurkić",
+        "name": "Jusuf Nurki\u0107",
         "team": "PHX",
         "position": "C",
         "role": "Frontcourt",
@@ -8982,7 +8982,7 @@
       },
       {
         "id": 204001,
-        "name": "Kristaps Porziņģis",
+        "name": "Kristaps Porzi\u0146\u0123is",
         "team": "BOS",
         "position": "F-C",
         "role": "Frontcourt",
@@ -10542,7 +10542,7 @@
       },
       {
         "id": 203999,
-        "name": "Nikola Jokić",
+        "name": "Nikola Joki\u0107",
         "team": "DEN",
         "position": "C",
         "role": "Frontcourt",
@@ -10906,7 +10906,7 @@
       },
       {
         "id": 202696,
-        "name": "Nikola Vučević",
+        "name": "Nikola Vu\u010devi\u0107",
         "team": "CHI",
         "position": "C",
         "role": "Frontcourt",
@@ -11556,7 +11556,7 @@
       },
       {
         "id": 1629029,
-        "name": "Luka Dončić",
+        "name": "Luka Don\u010di\u0107",
         "team": "DAL",
         "position": "F-G",
         "role": "Frontcourt",
@@ -12804,7 +12804,7 @@
       },
       {
         "id": 202685,
-        "name": "Jonas Valančiūnas",
+        "name": "Jonas Valan\u010di\u016bnas",
         "team": "NOP",
         "position": "C",
         "role": "Frontcourt",
@@ -13142,7 +13142,7 @@
       },
       {
         "id": 203967,
-        "name": "Dario Šarić",
+        "name": "Dario \u0160ari\u0107",
         "team": "GSW",
         "position": "F-C",
         "role": "Frontcourt",
@@ -13454,7 +13454,7 @@
       },
       {
         "id": 203471,
-        "name": "Dennis Schröder",
+        "name": "Dennis Schr\u00f6der",
         "team": "BKN",
         "position": "G",
         "role": "Guards",
@@ -13948,7 +13948,7 @@
       },
       {
         "id": 203992,
-        "name": "Bogdan Bogdanović",
+        "name": "Bogdan Bogdanovi\u0107",
         "team": "ATL",
         "position": "G",
         "role": "Guards",
@@ -14962,7 +14962,7 @@
       },
       {
         "id": 1631107,
-        "name": "Nikola Jović",
+        "name": "Nikola Jovi\u0107",
         "team": "MIA",
         "position": "F",
         "role": "Frontcourt",
@@ -15664,7 +15664,7 @@
       },
       {
         "id": 203957,
-        "name": "Danté Exum",
+        "name": "Dant\u00e9 Exum",
         "team": "DAL",
         "position": "G",
         "role": "Guards",
@@ -16264,7 +16264,7 @@
       },
       {
         "id": 204001,
-        "name": "Kristaps Porziņģis",
+        "name": "Kristaps Porzi\u0146\u0123is",
         "team": "WAS",
         "position": "F-C",
         "role": "Frontcourt",
@@ -16419,32 +16419,6 @@
         "confidence": "high"
       },
       {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 95.3,
-          "d1": 92.1,
-          "d2": 85.9,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.5
-        },
-        "ranks": {
-          "overall": 15
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
-        },
-        "confidence": "high"
-      },
-      {
         "id": 1630183,
         "name": "Jaden McDaniels",
         "team": "MIN",
@@ -16460,7 +16434,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 16
+          "overall": 15
         },
         "stats": {
           "gp": 79,
@@ -16486,7 +16460,7 @@
           "efficiency": 1.46
         },
         "ranks": {
-          "overall": 17
+          "overall": 16
         },
         "stats": {
           "gp": 72,
@@ -16512,7 +16486,7 @@
           "efficiency": 1.29
         },
         "ranks": {
-          "overall": 18
+          "overall": 17
         },
         "stats": {
           "gp": 70,
@@ -16538,7 +16512,7 @@
           "efficiency": 1.44
         },
         "ranks": {
-          "overall": 19
+          "overall": 18
         },
         "stats": {
           "gp": 73,
@@ -16564,7 +16538,7 @@
           "efficiency": 1.42
         },
         "ranks": {
-          "overall": 20
+          "overall": 19
         },
         "stats": {
           "gp": 76,
@@ -16590,7 +16564,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 21
+          "overall": 20
         },
         "stats": {
           "gp": 64,
@@ -16616,7 +16590,7 @@
           "efficiency": 1.41
         },
         "ranks": {
-          "overall": 22
+          "overall": 21
         },
         "stats": {
           "gp": 63,
@@ -16642,7 +16616,7 @@
           "efficiency": 1.25
         },
         "ranks": {
-          "overall": 23
+          "overall": 22
         },
         "stats": {
           "gp": 63,
@@ -16668,7 +16642,7 @@
           "efficiency": 1.29
         },
         "ranks": {
-          "overall": 24
+          "overall": 23
         },
         "stats": {
           "gp": 72,
@@ -16694,7 +16668,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 25
+          "overall": 24
         },
         "stats": {
           "gp": 66,
@@ -16720,7 +16694,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 26
+          "overall": 25
         },
         "stats": {
           "gp": 66,
@@ -16746,7 +16720,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 27
+          "overall": 26
         },
         "stats": {
           "gp": 68,
@@ -16772,7 +16746,7 @@
           "efficiency": 1.46
         },
         "ranks": {
-          "overall": 28
+          "overall": 27
         },
         "stats": {
           "gp": 54,
@@ -16798,7 +16772,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 29
+          "overall": 28
         },
         "stats": {
           "gp": 74,
@@ -16824,39 +16798,13 @@
           "efficiency": 1.2
         },
         "ranks": {
-          "overall": 30
+          "overall": 29
         },
         "stats": {
           "gp": 74,
           "min": 23.0,
           "stl": 0.4,
           "blk": 2.3
-        },
-        "confidence": "high"
-      },
-      {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 83.4,
-          "d1": 79.4,
-          "d2": 87.6,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.42
-        },
-        "ranks": {
-          "overall": 31
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
         },
         "confidence": "high"
       },
@@ -16876,39 +16824,13 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 32
+          "overall": 30
         },
         "stats": {
           "gp": 67,
           "min": 20.8,
           "stl": 0.6,
           "blk": 0.5
-        },
-        "confidence": "high"
-      },
-      {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 82.4,
-          "d1": 79.4,
-          "d2": 85.9,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.41
-        },
-        "ranks": {
-          "overall": 33
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
         },
         "confidence": "high"
       },
@@ -16928,7 +16850,7 @@
           "efficiency": 1.33
         },
         "ranks": {
-          "overall": 34
+          "overall": 31
         },
         "stats": {
           "gp": 80,
@@ -16954,7 +16876,7 @@
           "efficiency": 1.08
         },
         "ranks": {
-          "overall": 35
+          "overall": 32
         },
         "stats": {
           "gp": 79,
@@ -16980,7 +16902,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 36
+          "overall": 33
         },
         "stats": {
           "gp": 73,
@@ -17006,7 +16928,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 37
+          "overall": 34
         },
         "stats": {
           "gp": 62,
@@ -17032,7 +16954,7 @@
           "efficiency": 1.44
         },
         "ranks": {
-          "overall": 38
+          "overall": 35
         },
         "stats": {
           "gp": 67,
@@ -17058,65 +16980,13 @@
           "efficiency": 1.42
         },
         "ranks": {
-          "overall": 39
+          "overall": 36
         },
         "stats": {
           "gp": 78,
           "min": 20.6,
           "stl": 0.4,
           "blk": 1.3
-        },
-        "confidence": "high"
-      },
-      {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 80.5,
-          "d1": 92.1,
-          "d2": 69.9,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.38
-        },
-        "ranks": {
-          "overall": 40
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
-        },
-        "confidence": "high"
-      },
-      {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 79.5,
-          "d1": 92.1,
-          "d2": 68.1,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.37
-        },
-        "ranks": {
-          "overall": 41
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
         },
         "confidence": "high"
       },
@@ -17136,7 +17006,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 42
+          "overall": 37
         },
         "stats": {
           "gp": 63,
@@ -17162,7 +17032,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 43
+          "overall": 38
         },
         "stats": {
           "gp": 59,
@@ -17188,7 +17058,7 @@
           "efficiency": 1.28
         },
         "ranks": {
-          "overall": 44
+          "overall": 39
         },
         "stats": {
           "gp": 73,
@@ -17214,7 +17084,7 @@
           "efficiency": 1.0
         },
         "ranks": {
-          "overall": 45
+          "overall": 40
         },
         "stats": {
           "gp": 65,
@@ -17240,7 +17110,7 @@
           "efficiency": 1.42
         },
         "ranks": {
-          "overall": 46
+          "overall": 41
         },
         "stats": {
           "gp": 82,
@@ -17266,7 +17136,7 @@
           "efficiency": 1.18
         },
         "ranks": {
-          "overall": 47
+          "overall": 42
         },
         "stats": {
           "gp": 75,
@@ -17292,7 +17162,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 48
+          "overall": 43
         },
         "stats": {
           "gp": 81,
@@ -17318,7 +17188,7 @@
           "efficiency": 1.25
         },
         "ranks": {
-          "overall": 49
+          "overall": 44
         },
         "stats": {
           "gp": 82,
@@ -17344,7 +17214,7 @@
           "efficiency": 1.49
         },
         "ranks": {
-          "overall": 50
+          "overall": 45
         },
         "stats": {
           "gp": 75,
@@ -17370,7 +17240,7 @@
           "efficiency": 1.31
         },
         "ranks": {
-          "overall": 51
+          "overall": 46
         },
         "stats": {
           "gp": 63,
@@ -17396,7 +17266,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 52
+          "overall": 47
         },
         "stats": {
           "gp": 76,
@@ -17422,7 +17292,7 @@
           "efficiency": 1.19
         },
         "ranks": {
-          "overall": 53
+          "overall": 48
         },
         "stats": {
           "gp": 66,
@@ -17448,7 +17318,7 @@
           "efficiency": 1.14
         },
         "ranks": {
-          "overall": 54
+          "overall": 49
         },
         "stats": {
           "gp": 62,
@@ -17474,7 +17344,7 @@
           "efficiency": 1.01
         },
         "ranks": {
-          "overall": 55
+          "overall": 50
         },
         "stats": {
           "gp": 66,
@@ -17500,7 +17370,7 @@
           "efficiency": 1.28
         },
         "ranks": {
-          "overall": 56
+          "overall": 51
         },
         "stats": {
           "gp": 61,
@@ -17526,7 +17396,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 57
+          "overall": 52
         },
         "stats": {
           "gp": 74,
@@ -17552,7 +17422,7 @@
           "efficiency": 1.05
         },
         "ranks": {
-          "overall": 58
+          "overall": 53
         },
         "stats": {
           "gp": 78,
@@ -17578,7 +17448,7 @@
           "efficiency": 1.32
         },
         "ranks": {
-          "overall": 59
+          "overall": 54
         },
         "stats": {
           "gp": 82,
@@ -17604,39 +17474,13 @@
           "efficiency": 1.22
         },
         "ranks": {
-          "overall": 60
+          "overall": 55
         },
         "stats": {
           "gp": 80,
           "min": 31.0,
           "stl": 1.2,
           "blk": 0.3
-        },
-        "confidence": "high"
-      },
-      {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 73.5,
-          "d1": 79.4,
-          "d2": 69.9,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.27
-        },
-        "ranks": {
-          "overall": 61
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
         },
         "confidence": "high"
       },
@@ -17656,39 +17500,13 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 62
+          "overall": 56
         },
         "stats": {
           "gp": 61,
           "min": 23.7,
           "stl": 0.6,
           "blk": 0.2
-        },
-        "confidence": "high"
-      },
-      {
-        "id": 1628969,
-        "name": "Mikal Bridges",
-        "team": "BKN",
-        "position": "G-F",
-        "role": "Frontcourt",
-        "scores": {
-          "edi": 72.5,
-          "d1": 79.4,
-          "d2": 68.1,
-          "d3": 53.7,
-          "d4": 90.4,
-          "d5": 24.5,
-          "efficiency": 1.26
-        },
-        "ranks": {
-          "overall": 63
-        },
-        "stats": {
-          "gp": 83,
-          "min": 35.7,
-          "stl": 1.1,
-          "blk": 0.7
         },
         "confidence": "high"
       },
@@ -17708,7 +17526,7 @@
           "efficiency": 1.27
         },
         "ranks": {
-          "overall": 64
+          "overall": 57
         },
         "stats": {
           "gp": 67,
@@ -17734,7 +17552,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 65
+          "overall": 58
         },
         "stats": {
           "gp": 54,
@@ -17746,7 +17564,7 @@
       },
       {
         "id": 203471,
-        "name": "Dennis Schröder",
+        "name": "Dennis Schr\u00f6der",
         "team": "LAL",
         "position": "G",
         "role": "Guards",
@@ -17760,7 +17578,7 @@
           "efficiency": 1.42
         },
         "ranks": {
-          "overall": 66
+          "overall": 59
         },
         "stats": {
           "gp": 66,
@@ -17786,7 +17604,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 67
+          "overall": 60
         },
         "stats": {
           "gp": 68,
@@ -17812,7 +17630,7 @@
           "efficiency": 1.25
         },
         "ranks": {
-          "overall": 68
+          "overall": 61
         },
         "stats": {
           "gp": 80,
@@ -17838,7 +17656,7 @@
           "efficiency": 1.35
         },
         "ranks": {
-          "overall": 69
+          "overall": 62
         },
         "stats": {
           "gp": 82,
@@ -17864,7 +17682,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 70
+          "overall": 63
         },
         "stats": {
           "gp": 74,
@@ -17890,7 +17708,7 @@
           "efficiency": 1.39
         },
         "ranks": {
-          "overall": 71
+          "overall": 64
         },
         "stats": {
           "gp": 81,
@@ -17916,7 +17734,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 72
+          "overall": 65
         },
         "stats": {
           "gp": 75,
@@ -17942,7 +17760,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 73
+          "overall": 66
         },
         "stats": {
           "gp": 80,
@@ -17968,7 +17786,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 74
+          "overall": 67
         },
         "stats": {
           "gp": 58,
@@ -17994,7 +17812,7 @@
           "efficiency": 1.22
         },
         "ranks": {
-          "overall": 75
+          "overall": 68
         },
         "stats": {
           "gp": 61,
@@ -18020,7 +17838,7 @@
           "efficiency": 1.21
         },
         "ranks": {
-          "overall": 76
+          "overall": 69
         },
         "stats": {
           "gp": 61,
@@ -18046,7 +17864,7 @@
           "efficiency": 1.11
         },
         "ranks": {
-          "overall": 77
+          "overall": 70
         },
         "stats": {
           "gp": 72,
@@ -18072,7 +17890,7 @@
           "efficiency": 1.26
         },
         "ranks": {
-          "overall": 78
+          "overall": 71
         },
         "stats": {
           "gp": 52,
@@ -18098,7 +17916,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 79
+          "overall": 72
         },
         "stats": {
           "gp": 59,
@@ -18124,7 +17942,7 @@
           "efficiency": 1.27
         },
         "ranks": {
-          "overall": 80
+          "overall": 73
         },
         "stats": {
           "gp": 76,
@@ -18150,7 +17968,7 @@
           "efficiency": 1.31
         },
         "ranks": {
-          "overall": 81
+          "overall": 74
         },
         "stats": {
           "gp": 64,
@@ -18176,7 +17994,7 @@
           "efficiency": 1.21
         },
         "ranks": {
-          "overall": 82
+          "overall": 75
         },
         "stats": {
           "gp": 71,
@@ -18202,7 +18020,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 83
+          "overall": 76
         },
         "stats": {
           "gp": 67,
@@ -18228,7 +18046,7 @@
           "efficiency": 0.9
         },
         "ranks": {
-          "overall": 84
+          "overall": 77
         },
         "stats": {
           "gp": 75,
@@ -18254,7 +18072,7 @@
           "efficiency": 0.96
         },
         "ranks": {
-          "overall": 85
+          "overall": 78
         },
         "stats": {
           "gp": 69,
@@ -18280,7 +18098,7 @@
           "efficiency": 1.23
         },
         "ranks": {
-          "overall": 86
+          "overall": 79
         },
         "stats": {
           "gp": 68,
@@ -18306,7 +18124,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 87
+          "overall": 80
         },
         "stats": {
           "gp": 74,
@@ -18332,7 +18150,7 @@
           "efficiency": 1.16
         },
         "ranks": {
-          "overall": 88
+          "overall": 81
         },
         "stats": {
           "gp": 63,
@@ -18358,7 +18176,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 89
+          "overall": 82
         },
         "stats": {
           "gp": 56,
@@ -18384,7 +18202,7 @@
           "efficiency": 0.76
         },
         "ranks": {
-          "overall": 90
+          "overall": 83
         },
         "stats": {
           "gp": 72,
@@ -18410,7 +18228,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 91
+          "overall": 84
         },
         "stats": {
           "gp": 76,
@@ -18436,7 +18254,7 @@
           "efficiency": 0.9
         },
         "ranks": {
-          "overall": 92
+          "overall": 85
         },
         "stats": {
           "gp": 64,
@@ -18462,7 +18280,7 @@
           "efficiency": 1.3
         },
         "ranks": {
-          "overall": 93
+          "overall": 86
         },
         "stats": {
           "gp": 67,
@@ -18488,7 +18306,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 94
+          "overall": 87
         },
         "stats": {
           "gp": 73,
@@ -18514,7 +18332,7 @@
           "efficiency": 0.89
         },
         "ranks": {
-          "overall": 95
+          "overall": 88
         },
         "stats": {
           "gp": 75,
@@ -18540,7 +18358,7 @@
           "efficiency": 0.93
         },
         "ranks": {
-          "overall": 96
+          "overall": 89
         },
         "stats": {
           "gp": 79,
@@ -18566,7 +18384,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 97
+          "overall": 90
         },
         "stats": {
           "gp": 71,
@@ -18592,7 +18410,7 @@
           "efficiency": 1.19
         },
         "ranks": {
-          "overall": 98
+          "overall": 91
         },
         "stats": {
           "gp": 78,
@@ -18618,7 +18436,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 99
+          "overall": 92
         },
         "stats": {
           "gp": 59,
@@ -18644,7 +18462,7 @@
           "efficiency": 1.1
         },
         "ranks": {
-          "overall": 100
+          "overall": 93
         },
         "stats": {
           "gp": 78,
@@ -18670,7 +18488,7 @@
           "efficiency": 1.48
         },
         "ranks": {
-          "overall": 101
+          "overall": 94
         },
         "stats": {
           "gp": 56,
@@ -18696,7 +18514,7 @@
           "efficiency": 1.43
         },
         "ranks": {
-          "overall": 102
+          "overall": 95
         },
         "stats": {
           "gp": 77,
@@ -18722,7 +18540,7 @@
           "efficiency": 1.36
         },
         "ranks": {
-          "overall": 103
+          "overall": 96
         },
         "stats": {
           "gp": 76,
@@ -18734,7 +18552,7 @@
       },
       {
         "id": 203999,
-        "name": "Nikola Jokić",
+        "name": "Nikola Joki\u0107",
         "team": "DEN",
         "position": "C",
         "role": "Frontcourt",
@@ -18748,7 +18566,7 @@
           "efficiency": 0.63
         },
         "ranks": {
-          "overall": 104
+          "overall": 97
         },
         "stats": {
           "gp": 69,
@@ -18774,7 +18592,7 @@
           "efficiency": 1.06
         },
         "ranks": {
-          "overall": 105
+          "overall": 98
         },
         "stats": {
           "gp": 68,
@@ -18800,7 +18618,7 @@
           "efficiency": 1.43
         },
         "ranks": {
-          "overall": 106
+          "overall": 99
         },
         "stats": {
           "gp": 62,
@@ -18826,7 +18644,7 @@
           "efficiency": 1.0
         },
         "ranks": {
-          "overall": 107
+          "overall": 100
         },
         "stats": {
           "gp": 55,
@@ -18852,7 +18670,7 @@
           "efficiency": 1.09
         },
         "ranks": {
-          "overall": 108
+          "overall": 101
         },
         "stats": {
           "gp": 63,
@@ -18878,7 +18696,7 @@
           "efficiency": 0.89
         },
         "ranks": {
-          "overall": 109
+          "overall": 102
         },
         "stats": {
           "gp": 77,
@@ -18904,7 +18722,7 @@
           "efficiency": 0.78
         },
         "ranks": {
-          "overall": 110
+          "overall": 103
         },
         "stats": {
           "gp": 68,
@@ -18916,7 +18734,7 @@
       },
       {
         "id": 202696,
-        "name": "Nikola Vučević",
+        "name": "Nikola Vu\u010devi\u0107",
         "team": "CHI",
         "position": "C",
         "role": "Frontcourt",
@@ -18930,7 +18748,7 @@
           "efficiency": 0.78
         },
         "ranks": {
-          "overall": 111
+          "overall": 104
         },
         "stats": {
           "gp": 82,
@@ -18956,7 +18774,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 112
+          "overall": 105
         },
         "stats": {
           "gp": 50,
@@ -18982,7 +18800,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 113
+          "overall": 106
         },
         "stats": {
           "gp": 76,
@@ -19008,7 +18826,7 @@
           "efficiency": 1.46
         },
         "ranks": {
-          "overall": 114
+          "overall": 107
         },
         "stats": {
           "gp": 47,
@@ -19034,7 +18852,7 @@
           "efficiency": 1.06
         },
         "ranks": {
-          "overall": 115
+          "overall": 108
         },
         "stats": {
           "gp": 67,
@@ -19060,7 +18878,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 116
+          "overall": 109
         },
         "stats": {
           "gp": 76,
@@ -19086,7 +18904,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 117
+          "overall": 110
         },
         "stats": {
           "gp": 60,
@@ -19112,7 +18930,7 @@
           "efficiency": 0.82
         },
         "ranks": {
-          "overall": 118
+          "overall": 111
         },
         "stats": {
           "gp": 76,
@@ -19138,7 +18956,7 @@
           "efficiency": 1.12
         },
         "ranks": {
-          "overall": 119
+          "overall": 112
         },
         "stats": {
           "gp": 80,
@@ -19164,7 +18982,7 @@
           "efficiency": 1.11
         },
         "ranks": {
-          "overall": 120
+          "overall": 113
         },
         "stats": {
           "gp": 67,
@@ -19190,7 +19008,7 @@
           "efficiency": 1.03
         },
         "ranks": {
-          "overall": 121
+          "overall": 114
         },
         "stats": {
           "gp": 71,
@@ -19216,7 +19034,7 @@
           "efficiency": 0.87
         },
         "ranks": {
-          "overall": 122
+          "overall": 115
         },
         "stats": {
           "gp": 67,
@@ -19242,7 +19060,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 123
+          "overall": 116
         },
         "stats": {
           "gp": 70,
@@ -19268,7 +19086,7 @@
           "efficiency": 0.91
         },
         "ranks": {
-          "overall": 124
+          "overall": 117
         },
         "stats": {
           "gp": 68,
@@ -19294,7 +19112,7 @@
           "efficiency": 0.89
         },
         "ranks": {
-          "overall": 125
+          "overall": 118
         },
         "stats": {
           "gp": 56,
@@ -19320,7 +19138,7 @@
           "efficiency": 0.72
         },
         "ranks": {
-          "overall": 126
+          "overall": 119
         },
         "stats": {
           "gp": 71,
@@ -19346,7 +19164,7 @@
           "efficiency": 0.72
         },
         "ranks": {
-          "overall": 127
+          "overall": 120
         },
         "stats": {
           "gp": 77,
@@ -19358,7 +19176,7 @@
       },
       {
         "id": 1629029,
-        "name": "Luka Dončić",
+        "name": "Luka Don\u010di\u0107",
         "team": "DAL",
         "position": "F-G",
         "role": "Frontcourt",
@@ -19372,7 +19190,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 128
+          "overall": 121
         },
         "stats": {
           "gp": 66,
@@ -19398,7 +19216,7 @@
           "efficiency": 1.04
         },
         "ranks": {
-          "overall": 129
+          "overall": 122
         },
         "stats": {
           "gp": 53,
@@ -19424,7 +19242,7 @@
           "efficiency": 0.95
         },
         "ranks": {
-          "overall": 130
+          "overall": 123
         },
         "stats": {
           "gp": 79,
@@ -19450,7 +19268,7 @@
           "efficiency": 0.85
         },
         "ranks": {
-          "overall": 131
+          "overall": 124
         },
         "stats": {
           "gp": 61,
@@ -19476,7 +19294,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 132
+          "overall": 125
         },
         "stats": {
           "gp": 78,
@@ -19502,7 +19320,7 @@
           "efficiency": 0.87
         },
         "ranks": {
-          "overall": 133
+          "overall": 126
         },
         "stats": {
           "gp": 60,
@@ -19528,7 +19346,7 @@
           "efficiency": 0.62
         },
         "ranks": {
-          "overall": 134
+          "overall": 127
         },
         "stats": {
           "gp": 69,
@@ -19554,7 +19372,7 @@
           "efficiency": 0.84
         },
         "ranks": {
-          "overall": 135
+          "overall": 128
         },
         "stats": {
           "gp": 58,
@@ -19580,7 +19398,7 @@
           "efficiency": 1.05
         },
         "ranks": {
-          "overall": 136
+          "overall": 129
         },
         "stats": {
           "gp": 80,
@@ -19606,7 +19424,7 @@
           "efficiency": 0.93
         },
         "ranks": {
-          "overall": 137
+          "overall": 130
         },
         "stats": {
           "gp": 74,
@@ -19632,7 +19450,7 @@
           "efficiency": 0.87
         },
         "ranks": {
-          "overall": 138
+          "overall": 131
         },
         "stats": {
           "gp": 72,
@@ -19658,7 +19476,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 139
+          "overall": 132
         },
         "stats": {
           "gp": 52,
@@ -19684,7 +19502,7 @@
           "efficiency": 0.58
         },
         "ranks": {
-          "overall": 140
+          "overall": 133
         },
         "stats": {
           "gp": 65,
@@ -19710,7 +19528,7 @@
           "efficiency": 0.61
         },
         "ranks": {
-          "overall": 141
+          "overall": 134
         },
         "stats": {
           "gp": 71,
@@ -19722,7 +19540,7 @@
       },
       {
         "id": 203994,
-        "name": "Jusuf Nurkić",
+        "name": "Jusuf Nurki\u0107",
         "team": "POR",
         "position": "C",
         "role": "Frontcourt",
@@ -19736,7 +19554,7 @@
           "efficiency": 1.13
         },
         "ranks": {
-          "overall": 142
+          "overall": 135
         },
         "stats": {
           "gp": 52,
@@ -19762,7 +19580,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 143
+          "overall": 136
         },
         "stats": {
           "gp": 63,
@@ -19788,7 +19606,7 @@
           "efficiency": 1.0
         },
         "ranks": {
-          "overall": 144
+          "overall": 137
         },
         "stats": {
           "gp": 79,
@@ -19814,7 +19632,7 @@
           "efficiency": 1.1
         },
         "ranks": {
-          "overall": 145
+          "overall": 138
         },
         "stats": {
           "gp": 65,
@@ -19840,7 +19658,7 @@
           "efficiency": 0.96
         },
         "ranks": {
-          "overall": 146
+          "overall": 139
         },
         "stats": {
           "gp": 60,
@@ -19866,7 +19684,7 @@
           "efficiency": 0.57
         },
         "ranks": {
-          "overall": 147
+          "overall": 140
         },
         "stats": {
           "gp": 68,
@@ -19892,7 +19710,7 @@
           "efficiency": 1.1
         },
         "ranks": {
-          "overall": 148
+          "overall": 141
         },
         "stats": {
           "gp": 56,
@@ -19918,7 +19736,7 @@
           "efficiency": 0.89
         },
         "ranks": {
-          "overall": 149
+          "overall": 142
         },
         "stats": {
           "gp": 73,
@@ -19944,7 +19762,7 @@
           "efficiency": 1.18
         },
         "ranks": {
-          "overall": 150
+          "overall": 143
         },
         "stats": {
           "gp": 65,
@@ -19970,7 +19788,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 151
+          "overall": 144
         },
         "stats": {
           "gp": 42,
@@ -19996,7 +19814,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 152
+          "overall": 145
         },
         "stats": {
           "gp": 67,
@@ -20022,7 +19840,7 @@
           "efficiency": 0.67
         },
         "ranks": {
-          "overall": 153
+          "overall": 146
         },
         "stats": {
           "gp": 73,
@@ -20048,7 +19866,7 @@
           "efficiency": 0.79
         },
         "ranks": {
-          "overall": 154
+          "overall": 147
         },
         "stats": {
           "gp": 77,
@@ -20074,7 +19892,7 @@
           "efficiency": 0.99
         },
         "ranks": {
-          "overall": 155
+          "overall": 148
         },
         "stats": {
           "gp": 68,
@@ -20086,7 +19904,7 @@
       },
       {
         "id": 202685,
-        "name": "Jonas Valančiūnas",
+        "name": "Jonas Valan\u010di\u016bnas",
         "team": "NOP",
         "position": "C",
         "role": "Frontcourt",
@@ -20100,7 +19918,7 @@
           "efficiency": 1.12
         },
         "ranks": {
-          "overall": 156
+          "overall": 149
         },
         "stats": {
           "gp": 79,
@@ -20126,7 +19944,7 @@
           "efficiency": 1.16
         },
         "ranks": {
-          "overall": 157
+          "overall": 150
         },
         "stats": {
           "gp": 57,
@@ -20152,7 +19970,7 @@
           "efficiency": 0.58
         },
         "ranks": {
-          "overall": 158
+          "overall": 151
         },
         "stats": {
           "gp": 79,
@@ -20178,7 +19996,7 @@
           "efficiency": 1.41
         },
         "ranks": {
-          "overall": 159
+          "overall": 152
         },
         "stats": {
           "gp": 77,
@@ -20204,7 +20022,7 @@
           "efficiency": 1.08
         },
         "ranks": {
-          "overall": 160
+          "overall": 153
         },
         "stats": {
           "gp": 50,
@@ -20230,7 +20048,7 @@
           "efficiency": 0.66
         },
         "ranks": {
-          "overall": 161
+          "overall": 154
         },
         "stats": {
           "gp": 70,
@@ -20256,7 +20074,7 @@
           "efficiency": 0.8
         },
         "ranks": {
-          "overall": 162
+          "overall": 155
         },
         "stats": {
           "gp": 71,
@@ -20282,7 +20100,7 @@
           "efficiency": 1.05
         },
         "ranks": {
-          "overall": 163
+          "overall": 156
         },
         "stats": {
           "gp": 77,
@@ -20308,7 +20126,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 164
+          "overall": 157
         },
         "stats": {
           "gp": 74,
@@ -20334,7 +20152,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 165
+          "overall": 158
         },
         "stats": {
           "gp": 75,
@@ -20360,7 +20178,7 @@
           "efficiency": 1.26
         },
         "ranks": {
-          "overall": 166
+          "overall": 159
         },
         "stats": {
           "gp": 60,
@@ -20386,7 +20204,7 @@
           "efficiency": 0.64
         },
         "ranks": {
-          "overall": 167
+          "overall": 160
         },
         "stats": {
           "gp": 76,
@@ -20412,7 +20230,7 @@
           "efficiency": 1.1
         },
         "ranks": {
-          "overall": 168
+          "overall": 161
         },
         "stats": {
           "gp": 69,
@@ -20438,7 +20256,7 @@
           "efficiency": 1.36
         },
         "ranks": {
-          "overall": 169
+          "overall": 162
         },
         "stats": {
           "gp": 81,
@@ -20464,7 +20282,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 170
+          "overall": 163
         },
         "stats": {
           "gp": 80,
@@ -20490,7 +20308,7 @@
           "efficiency": 0.95
         },
         "ranks": {
-          "overall": 171
+          "overall": 164
         },
         "stats": {
           "gp": 76,
@@ -20516,7 +20334,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 172
+          "overall": 165
         },
         "stats": {
           "gp": 46,
@@ -20542,7 +20360,7 @@
           "efficiency": 0.53
         },
         "ranks": {
-          "overall": 173
+          "overall": 166
         },
         "stats": {
           "gp": 71,
@@ -20568,7 +20386,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 174
+          "overall": 167
         },
         "stats": {
           "gp": 82,
@@ -20594,7 +20412,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 175
+          "overall": 168
         },
         "stats": {
           "gp": 76,
@@ -20620,7 +20438,7 @@
           "efficiency": 0.71
         },
         "ranks": {
-          "overall": 176
+          "overall": 169
         },
         "stats": {
           "gp": 75,
@@ -20646,7 +20464,7 @@
           "efficiency": 1.4
         },
         "ranks": {
-          "overall": 177
+          "overall": 170
         },
         "stats": {
           "gp": 61,
@@ -20672,7 +20490,7 @@
           "efficiency": 0.53
         },
         "ranks": {
-          "overall": 178
+          "overall": 171
         },
         "stats": {
           "gp": 74,
@@ -20698,7 +20516,7 @@
           "efficiency": 0.76
         },
         "ranks": {
-          "overall": 179
+          "overall": 172
         },
         "stats": {
           "gp": 53,
@@ -20724,7 +20542,7 @@
           "efficiency": 1.03
         },
         "ranks": {
-          "overall": 180
+          "overall": 173
         },
         "stats": {
           "gp": 70,
@@ -20750,7 +20568,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 181
+          "overall": 174
         },
         "stats": {
           "gp": 79,
@@ -20776,7 +20594,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 182
+          "overall": 175
         },
         "stats": {
           "gp": 62,
@@ -20802,7 +20620,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 183
+          "overall": 176
         },
         "stats": {
           "gp": 59,
@@ -20828,7 +20646,7 @@
           "efficiency": 0.93
         },
         "ranks": {
-          "overall": 184
+          "overall": 177
         },
         "stats": {
           "gp": 77,
@@ -20854,7 +20672,7 @@
           "efficiency": 1.03
         },
         "ranks": {
-          "overall": 185
+          "overall": 178
         },
         "stats": {
           "gp": 67,
@@ -20880,7 +20698,7 @@
           "efficiency": 1.41
         },
         "ranks": {
-          "overall": 186
+          "overall": 179
         },
         "stats": {
           "gp": 49,
@@ -20906,7 +20724,7 @@
           "efficiency": 1.28
         },
         "ranks": {
-          "overall": 187
+          "overall": 180
         },
         "stats": {
           "gp": 65,
@@ -20932,7 +20750,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 188
+          "overall": 181
         },
         "stats": {
           "gp": 59,
@@ -20958,7 +20776,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 189
+          "overall": 182
         },
         "stats": {
           "gp": 68,
@@ -20984,7 +20802,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 190
+          "overall": 183
         },
         "stats": {
           "gp": 65,
@@ -21010,7 +20828,7 @@
           "efficiency": 0.63
         },
         "ranks": {
-          "overall": 191
+          "overall": 184
         },
         "stats": {
           "gp": 62,
@@ -21036,7 +20854,7 @@
           "efficiency": 0.68
         },
         "ranks": {
-          "overall": 192
+          "overall": 185
         },
         "stats": {
           "gp": 57,
@@ -21062,7 +20880,7 @@
           "efficiency": 0.85
         },
         "ranks": {
-          "overall": 193
+          "overall": 186
         },
         "stats": {
           "gp": 55,
@@ -21088,7 +20906,7 @@
           "efficiency": 1.47
         },
         "ranks": {
-          "overall": 194
+          "overall": 187
         },
         "stats": {
           "gp": 52,
@@ -21114,7 +20932,7 @@
           "efficiency": 0.67
         },
         "ranks": {
-          "overall": 195
+          "overall": 188
         },
         "stats": {
           "gp": 80,
@@ -21140,7 +20958,7 @@
           "efficiency": 1.28
         },
         "ranks": {
-          "overall": 196
+          "overall": 189
         },
         "stats": {
           "gp": 63,
@@ -21166,7 +20984,7 @@
           "efficiency": 0.99
         },
         "ranks": {
-          "overall": 197
+          "overall": 190
         },
         "stats": {
           "gp": 48,
@@ -21192,7 +21010,7 @@
           "efficiency": 1.06
         },
         "ranks": {
-          "overall": 198
+          "overall": 191
         },
         "stats": {
           "gp": 50,
@@ -21218,7 +21036,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 199
+          "overall": 192
         },
         "stats": {
           "gp": 56,
@@ -21244,7 +21062,7 @@
           "efficiency": 0.64
         },
         "ranks": {
-          "overall": 200
+          "overall": 193
         },
         "stats": {
           "gp": 50,
@@ -21270,7 +21088,7 @@
           "efficiency": 0.95
         },
         "ranks": {
-          "overall": 201
+          "overall": 194
         },
         "stats": {
           "gp": 69,
@@ -21296,7 +21114,7 @@
           "efficiency": 1.36
         },
         "ranks": {
-          "overall": 202
+          "overall": 195
         },
         "stats": {
           "gp": 42,
@@ -21322,7 +21140,7 @@
           "efficiency": 0.56
         },
         "ranks": {
-          "overall": 203
+          "overall": 196
         },
         "stats": {
           "gp": 55,
@@ -21348,7 +21166,7 @@
           "efficiency": 1.34
         },
         "ranks": {
-          "overall": 204
+          "overall": 197
         },
         "stats": {
           "gp": 48,
@@ -21374,7 +21192,7 @@
           "efficiency": 1.09
         },
         "ranks": {
-          "overall": 205
+          "overall": 198
         },
         "stats": {
           "gp": 80,
@@ -21386,7 +21204,7 @@
       },
       {
         "id": 1628420,
-        "name": "Monté Morris",
+        "name": "Mont\u00e9 Morris",
         "team": "WAS",
         "position": "G",
         "role": "Guards",
@@ -21400,7 +21218,7 @@
           "efficiency": 0.77
         },
         "ranks": {
-          "overall": 206
+          "overall": 199
         },
         "stats": {
           "gp": 62,
@@ -21426,7 +21244,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 207
+          "overall": 200
         },
         "stats": {
           "gp": 69,
@@ -21452,7 +21270,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 208
+          "overall": 201
         },
         "stats": {
           "gp": 73,
@@ -21478,7 +21296,7 @@
           "efficiency": 1.07
         },
         "ranks": {
-          "overall": 209
+          "overall": 202
         },
         "stats": {
           "gp": 62,
@@ -21504,7 +21322,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 210
+          "overall": 203
         },
         "stats": {
           "gp": 76,
@@ -21530,7 +21348,7 @@
           "efficiency": 0.65
         },
         "ranks": {
-          "overall": 211
+          "overall": 204
         },
         "stats": {
           "gp": 73,
@@ -21542,7 +21360,7 @@
       },
       {
         "id": 203992,
-        "name": "Bogdan Bogdanović",
+        "name": "Bogdan Bogdanovi\u0107",
         "team": "ATL",
         "position": "G",
         "role": "Guards",
@@ -21556,7 +21374,7 @@
           "efficiency": 0.7
         },
         "ranks": {
-          "overall": 212
+          "overall": 205
         },
         "stats": {
           "gp": 54,
@@ -21582,7 +21400,7 @@
           "efficiency": 0.55
         },
         "ranks": {
-          "overall": 213
+          "overall": 206
         },
         "stats": {
           "gp": 62,
@@ -21608,7 +21426,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 214
+          "overall": 207
         },
         "stats": {
           "gp": 56,
@@ -21634,7 +21452,7 @@
           "efficiency": 0.68
         },
         "ranks": {
-          "overall": 215
+          "overall": 208
         },
         "stats": {
           "gp": 67,
@@ -21660,7 +21478,7 @@
           "efficiency": 1.4
         },
         "ranks": {
-          "overall": 216
+          "overall": 209
         },
         "stats": {
           "gp": 52,
@@ -21686,7 +21504,7 @@
           "efficiency": 0.89
         },
         "ranks": {
-          "overall": 217
+          "overall": 210
         },
         "stats": {
           "gp": 54,
@@ -21712,7 +21530,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 218
+          "overall": 211
         },
         "stats": {
           "gp": 66,
@@ -21738,7 +21556,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 219
+          "overall": 212
         },
         "stats": {
           "gp": 68,
@@ -21764,7 +21582,7 @@
           "efficiency": 1.5
         },
         "ranks": {
-          "overall": 220
+          "overall": 213
         },
         "stats": {
           "gp": 48,
@@ -21790,7 +21608,7 @@
           "efficiency": 1.28
         },
         "ranks": {
-          "overall": 221
+          "overall": 214
         },
         "stats": {
           "gp": 43,
@@ -21816,7 +21634,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 222
+          "overall": 215
         },
         "stats": {
           "gp": 76,
@@ -21842,7 +21660,7 @@
           "efficiency": 0.62
         },
         "ranks": {
-          "overall": 223
+          "overall": 216
         },
         "stats": {
           "gp": 72,
@@ -21868,7 +21686,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 224
+          "overall": 217
         },
         "stats": {
           "gp": 79,
@@ -21894,7 +21712,7 @@
           "efficiency": 0.91
         },
         "ranks": {
-          "overall": 225
+          "overall": 218
         },
         "stats": {
           "gp": 53,
@@ -21920,7 +21738,7 @@
           "efficiency": 1.21
         },
         "ranks": {
-          "overall": 226
+          "overall": 219
         },
         "stats": {
           "gp": 59,
@@ -21946,7 +21764,7 @@
           "efficiency": 0.69
         },
         "ranks": {
-          "overall": 227
+          "overall": 220
         },
         "stats": {
           "gp": 62,
@@ -21972,7 +21790,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 228
+          "overall": 221
         },
         "stats": {
           "gp": 63,
@@ -21998,7 +21816,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 229
+          "overall": 222
         },
         "stats": {
           "gp": 73,
@@ -22024,7 +21842,7 @@
           "efficiency": 0.74
         },
         "ranks": {
-          "overall": 230
+          "overall": 223
         },
         "stats": {
           "gp": 81,
@@ -22050,7 +21868,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 231
+          "overall": 224
         },
         "stats": {
           "gp": 80,
@@ -22076,7 +21894,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 232
+          "overall": 225
         },
         "stats": {
           "gp": 75,
@@ -22102,7 +21920,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 233
+          "overall": 226
         },
         "stats": {
           "gp": 58,
@@ -22128,7 +21946,7 @@
           "efficiency": 0.96
         },
         "ranks": {
-          "overall": 234
+          "overall": 227
         },
         "stats": {
           "gp": 78,
@@ -22154,7 +21972,7 @@
           "efficiency": 0.72
         },
         "ranks": {
-          "overall": 235
+          "overall": 228
         },
         "stats": {
           "gp": 82,
@@ -22180,7 +21998,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 236
+          "overall": 229
         },
         "stats": {
           "gp": 65,
@@ -22206,7 +22024,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 237
+          "overall": 230
         },
         "stats": {
           "gp": 74,
@@ -22232,7 +22050,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 238
+          "overall": 231
         },
         "stats": {
           "gp": 77,
@@ -22258,7 +22076,7 @@
           "efficiency": 0.91
         },
         "ranks": {
-          "overall": 239
+          "overall": 232
         },
         "stats": {
           "gp": 56,
@@ -22284,7 +22102,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 240
+          "overall": 233
         },
         "stats": {
           "gp": 67,
@@ -22310,7 +22128,7 @@
           "efficiency": 1.26
         },
         "ranks": {
-          "overall": 241
+          "overall": 234
         },
         "stats": {
           "gp": 44,
@@ -22336,7 +22154,7 @@
           "efficiency": 1.11
         },
         "ranks": {
-          "overall": 242
+          "overall": 235
         },
         "stats": {
           "gp": 45,
@@ -22362,7 +22180,7 @@
           "efficiency": 0.56
         },
         "ranks": {
-          "overall": 243
+          "overall": 236
         },
         "stats": {
           "gp": 65,
@@ -22388,7 +22206,7 @@
           "efficiency": 0.74
         },
         "ranks": {
-          "overall": 244
+          "overall": 237
         },
         "stats": {
           "gp": 78,
@@ -22414,7 +22232,7 @@
           "efficiency": 0.52
         },
         "ranks": {
-          "overall": 245
+          "overall": 238
         },
         "stats": {
           "gp": 48,
@@ -22440,7 +22258,7 @@
           "efficiency": 0.97
         },
         "ranks": {
-          "overall": 246
+          "overall": 239
         },
         "stats": {
           "gp": 51,
@@ -22466,7 +22284,7 @@
           "efficiency": 1.0
         },
         "ranks": {
-          "overall": 247
+          "overall": 240
         },
         "stats": {
           "gp": 42,
@@ -22492,7 +22310,7 @@
           "efficiency": 0.56
         },
         "ranks": {
-          "overall": 248
+          "overall": 241
         },
         "stats": {
           "gp": 67,
@@ -22518,7 +22336,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 249
+          "overall": 242
         },
         "stats": {
           "gp": 49,
@@ -22544,7 +22362,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 250
+          "overall": 243
         },
         "stats": {
           "gp": 63,
@@ -22570,7 +22388,7 @@
           "efficiency": 0.66
         },
         "ranks": {
-          "overall": 251
+          "overall": 244
         },
         "stats": {
           "gp": 82,
@@ -22596,7 +22414,7 @@
           "efficiency": 0.83
         },
         "ranks": {
-          "overall": 252
+          "overall": 245
         },
         "stats": {
           "gp": 68,
@@ -22622,7 +22440,7 @@
           "efficiency": 0.52
         },
         "ranks": {
-          "overall": 253
+          "overall": 246
         },
         "stats": {
           "gp": 59,
@@ -22648,7 +22466,7 @@
           "efficiency": 1.07
         },
         "ranks": {
-          "overall": 254
+          "overall": 247
         },
         "stats": {
           "gp": 74,
@@ -22674,7 +22492,7 @@
           "efficiency": 1.07
         },
         "ranks": {
-          "overall": 255
+          "overall": 248
         },
         "stats": {
           "gp": 42,
@@ -22700,7 +22518,7 @@
           "efficiency": 0.94
         },
         "ranks": {
-          "overall": 256
+          "overall": 249
         },
         "stats": {
           "gp": 60,
@@ -22726,7 +22544,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 257
+          "overall": 250
         },
         "stats": {
           "gp": 80,
@@ -22752,7 +22570,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 258
+          "overall": 251
         },
         "stats": {
           "gp": 79,
@@ -22778,7 +22596,7 @@
           "efficiency": 0.73
         },
         "ranks": {
-          "overall": 259
+          "overall": 252
         },
         "stats": {
           "gp": 48,
@@ -22804,7 +22622,7 @@
           "efficiency": 1.03
         },
         "ranks": {
-          "overall": 260
+          "overall": 253
         },
         "stats": {
           "gp": 47,
@@ -22830,7 +22648,7 @@
           "efficiency": 0.58
         },
         "ranks": {
-          "overall": 261
+          "overall": 254
         },
         "stats": {
           "gp": 77,
@@ -22856,7 +22674,7 @@
           "efficiency": 0.78
         },
         "ranks": {
-          "overall": 262
+          "overall": 255
         },
         "stats": {
           "gp": 56,
@@ -22882,7 +22700,7 @@
           "efficiency": 0.58
         },
         "ranks": {
-          "overall": 263
+          "overall": 256
         },
         "stats": {
           "gp": 42,
@@ -22908,7 +22726,7 @@
           "efficiency": 0.61
         },
         "ranks": {
-          "overall": 264
+          "overall": 257
         },
         "stats": {
           "gp": 58,
@@ -22934,7 +22752,7 @@
           "efficiency": 0.56
         },
         "ranks": {
-          "overall": 265
+          "overall": 258
         },
         "stats": {
           "gp": 54,
@@ -22960,7 +22778,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 266
+          "overall": 259
         },
         "stats": {
           "gp": 70,
@@ -22986,7 +22804,7 @@
           "efficiency": 0.62
         },
         "ranks": {
-          "overall": 267
+          "overall": 260
         },
         "stats": {
           "gp": 72,
@@ -23012,7 +22830,7 @@
           "efficiency": 1.01
         },
         "ranks": {
-          "overall": 268
+          "overall": 261
         },
         "stats": {
           "gp": 58,
@@ -23038,7 +22856,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 269
+          "overall": 262
         },
         "stats": {
           "gp": 60,
@@ -23064,7 +22882,7 @@
           "efficiency": 0.92
         },
         "ranks": {
-          "overall": 270
+          "overall": 263
         },
         "stats": {
           "gp": 57,
@@ -23090,7 +22908,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 271
+          "overall": 264
         },
         "stats": {
           "gp": 62,
@@ -23116,7 +22934,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 272
+          "overall": 265
         },
         "stats": {
           "gp": 63,
@@ -23142,7 +22960,7 @@
           "efficiency": 0.72
         },
         "ranks": {
-          "overall": 273
+          "overall": 266
         },
         "stats": {
           "gp": 62,
@@ -23168,7 +22986,7 @@
           "efficiency": 0.63
         },
         "ranks": {
-          "overall": 274
+          "overall": 267
         },
         "stats": {
           "gp": 59,
@@ -23194,7 +23012,7 @@
           "efficiency": 0.91
         },
         "ranks": {
-          "overall": 275
+          "overall": 268
         },
         "stats": {
           "gp": 43,
@@ -23220,7 +23038,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 276
+          "overall": 269
         },
         "stats": {
           "gp": 56,
@@ -23246,7 +23064,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 277
+          "overall": 270
         },
         "stats": {
           "gp": 74,
@@ -23272,7 +23090,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 278
+          "overall": 271
         },
         "stats": {
           "gp": 74,
@@ -23298,7 +23116,7 @@
           "efficiency": 1.03
         },
         "ranks": {
-          "overall": 279
+          "overall": 272
         },
         "stats": {
           "gp": 51,
@@ -23324,7 +23142,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 280
+          "overall": 273
         },
         "stats": {
           "gp": 80,
@@ -23350,7 +23168,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 281
+          "overall": 274
         },
         "stats": {
           "gp": 56,
@@ -23376,7 +23194,7 @@
           "efficiency": 0.63
         },
         "ranks": {
-          "overall": 282
+          "overall": 275
         },
         "stats": {
           "gp": 66,
@@ -23402,7 +23220,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 283
+          "overall": 276
         },
         "stats": {
           "gp": 44,
@@ -23428,7 +23246,7 @@
           "efficiency": 0.68
         },
         "ranks": {
-          "overall": 284
+          "overall": 277
         },
         "stats": {
           "gp": 46,
@@ -23454,7 +23272,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 285
+          "overall": 278
         },
         "stats": {
           "gp": 57,
@@ -23480,7 +23298,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 286
+          "overall": 279
         },
         "stats": {
           "gp": 45,
@@ -23506,7 +23324,7 @@
           "efficiency": 0.69
         },
         "ranks": {
-          "overall": 287
+          "overall": 280
         },
         "stats": {
           "gp": 43,
@@ -23532,7 +23350,7 @@
           "efficiency": 0.85
         },
         "ranks": {
-          "overall": 288
+          "overall": 281
         },
         "stats": {
           "gp": 46,
@@ -23558,7 +23376,7 @@
           "efficiency": 0.53
         },
         "ranks": {
-          "overall": 289
+          "overall": 282
         },
         "stats": {
           "gp": 46,
@@ -23584,7 +23402,7 @@
           "efficiency": 0.56
         },
         "ranks": {
-          "overall": 290
+          "overall": 283
         },
         "stats": {
           "gp": 43,
@@ -23610,7 +23428,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 291
+          "overall": 284
         },
         "stats": {
           "gp": 65,
@@ -23636,7 +23454,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 292
+          "overall": 285
         },
         "stats": {
           "gp": 60,
@@ -23662,7 +23480,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 293
+          "overall": 286
         },
         "stats": {
           "gp": 76,
@@ -23688,7 +23506,7 @@
           "efficiency": 0.62
         },
         "ranks": {
-          "overall": 294
+          "overall": 287
         },
         "stats": {
           "gp": 42,
@@ -23714,7 +23532,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 295
+          "overall": 288
         },
         "stats": {
           "gp": 74,
@@ -23740,7 +23558,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 296
+          "overall": 289
         },
         "stats": {
           "gp": 43,
@@ -23766,7 +23584,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 297
+          "overall": 290
         },
         "stats": {
           "gp": 52,
@@ -23792,7 +23610,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 298
+          "overall": 291
         },
         "stats": {
           "gp": 61,
@@ -23818,7 +23636,7 @@
           "efficiency": 0.53
         },
         "ranks": {
-          "overall": 299
+          "overall": 292
         },
         "stats": {
           "gp": 64,
@@ -23844,7 +23662,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 300
+          "overall": 293
         },
         "stats": {
           "gp": 45,
@@ -23870,7 +23688,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 301
+          "overall": 294
         },
         "stats": {
           "gp": 46,
@@ -23896,7 +23714,7 @@
           "efficiency": 0.5
         },
         "ranks": {
-          "overall": 302
+          "overall": 295
         },
         "stats": {
           "gp": 42,
@@ -25236,7 +25054,7 @@
       },
       {
         "id": 203999,
-        "name": "Nikola Jokić",
+        "name": "Nikola Joki\u0107",
         "team": "DEN",
         "position": "C",
         "role": "Frontcourt",
@@ -25288,7 +25106,7 @@
       },
       {
         "id": 202696,
-        "name": "Nikola Vučević",
+        "name": "Nikola Vu\u010devi\u0107",
         "team": "CHI",
         "position": "C",
         "role": "Frontcourt",
@@ -25886,7 +25704,7 @@
       },
       {
         "id": 202685,
-        "name": "Jonas Valančiūnas",
+        "name": "Jonas Valan\u010di\u016bnas",
         "team": "NOP",
         "position": "C",
         "role": "Frontcourt",
@@ -27264,7 +27082,7 @@
       },
       {
         "id": 204001,
-        "name": "Kristaps Porziņģis",
+        "name": "Kristaps Porzi\u0146\u0123is",
         "team": "WAS",
         "position": "F-C",
         "role": "Frontcourt",
@@ -27368,7 +27186,7 @@
       },
       {
         "id": 1629029,
-        "name": "Luka Dončić",
+        "name": "Luka Don\u010di\u0107",
         "team": "DAL",
         "position": "F-G",
         "role": "Frontcourt",
@@ -27914,7 +27732,7 @@
       },
       {
         "id": 203994,
-        "name": "Jusuf Nurkić",
+        "name": "Jusuf Nurki\u0107",
         "team": "POR",
         "position": "C",
         "role": "Frontcourt",
@@ -28434,7 +28252,7 @@
       },
       {
         "id": 203471,
-        "name": "Dennis Schröder",
+        "name": "Dennis Schr\u00f6der",
         "team": "HOU",
         "position": "G",
         "role": "Guards",
@@ -29136,7 +28954,7 @@
       },
       {
         "id": 203992,
-        "name": "Bogdan Bogdanović",
+        "name": "Bogdan Bogdanovi\u0107",
         "team": "ATL",
         "position": "G",
         "role": "Guards",
@@ -29396,7 +29214,7 @@
       },
       {
         "id": 1628420,
-        "name": "Monté Morris",
+        "name": "Mont\u00e9 Morris",
         "team": "DEN",
         "position": "G",
         "role": "Guards",
@@ -32856,7 +32674,7 @@
       },
       {
         "id": 203994,
-        "name": "Jusuf Nurkić",
+        "name": "Jusuf Nurki\u0107",
         "team": "POR",
         "position": "C",
         "role": "Frontcourt",
@@ -33818,7 +33636,7 @@
       },
       {
         "id": 203999,
-        "name": "Nikola Jokić",
+        "name": "Nikola Joki\u0107",
         "team": "DEN",
         "position": "C",
         "role": "Frontcourt",
@@ -34052,7 +33870,7 @@
       },
       {
         "id": 1628420,
-        "name": "Monté Morris",
+        "name": "Mont\u00e9 Morris",
         "team": "DEN",
         "position": "G",
         "role": "Guards",
@@ -34104,7 +33922,7 @@
       },
       {
         "id": 203967,
-        "name": "Dario Šarić",
+        "name": "Dario \u0160ari\u0107",
         "team": "PHX",
         "position": "F-C",
         "role": "Frontcourt",
@@ -34572,7 +34390,7 @@
       },
       {
         "id": 202685,
-        "name": "Jonas Valančiūnas",
+        "name": "Jonas Valan\u010di\u016bnas",
         "team": "MEM",
         "position": "C",
         "role": "Frontcourt",
@@ -34676,7 +34494,7 @@
       },
       {
         "id": 204001,
-        "name": "Kristaps Porziņģis",
+        "name": "Kristaps Porzi\u0146\u0123is",
         "team": "DAL",
         "position": "F-C",
         "role": "Frontcourt",
@@ -35482,7 +35300,7 @@
       },
       {
         "id": 202696,
-        "name": "Nikola Vučević",
+        "name": "Nikola Vu\u010devi\u0107",
         "team": "CHI",
         "position": "C",
         "role": "Frontcourt",
@@ -36392,7 +36210,7 @@
       },
       {
         "id": 1629029,
-        "name": "Luka Dončić",
+        "name": "Luka Don\u010di\u0107",
         "team": "DAL",
         "position": "F-G",
         "role": "Frontcourt",
@@ -36730,7 +36548,7 @@
       },
       {
         "id": 203471,
-        "name": "Dennis Schröder",
+        "name": "Dennis Schr\u00f6der",
         "team": "LAL",
         "position": "G",
         "role": "Guards",
@@ -36808,7 +36626,7 @@
       },
       {
         "id": 203992,
-        "name": "Bogdan Bogdanović",
+        "name": "Bogdan Bogdanovi\u0107",
         "team": "ATL",
         "position": "G",
         "role": "Guards",
