@@ -159,6 +159,20 @@ EDI provides the context necessary for accurate evaluation whether distinguishin
 
 ---
 
+## References
+
+### Academic Literature
+1. Morris, C. (1983). *Parametric Empirical Bayes Inference: Theory and Applications*. Journal of the American Statistical Association.
+2. Goldberry, K. (2012). *Spatial Analysis of NBA Shot Data*. MIT Sloan Sports Analytics Conference.
+3. James, W., & Stein, C. (1961). *Estimation with Quadratic Loss*. Proceedings of the Fourth Berkeley Symposium.
+
+### Industry Reports
+1. Basketball Reference. *Defensive Rating Methodology*. https://www.basketball-reference.com
+2. Cleaning the Glass. *Position-Adjusted Defensive Metrics*. https://cleaningtheglass.com
+3. ESPN. *Real Plus-Minus (RPM) Explainer*. http://www.espn.com/nba/statistics/rpm
+
+---
+
 ### Appendix: Mathematical Formulation
 
 **Bayesian Score:**
@@ -174,21 +188,6 @@ $$\text{EDI} = \frac{\sum (D_i \times W_i) + \text{SynergyBonus}}{\sum W_i} \tim
 <div align="center">
 
 **Report Generated:** 2026-01-17  
-**Model Version:** EDI v2.4  
 **Data Sources:** NBA Stats API (Official Tracking Data)
 
 </div>
-
----
-
-## References
-
-### Academic Literature
-1. Morris, C. (1983). *Parametric Empirical Bayes Inference: Theory and Applications*. Journal of the American Statistical Association.
-2. Goldberry, K. (2012). *Spatial Analysis of NBA Shot Data*. MIT Sloan Sports Analytics Conference.
-3. James, W., & Stein, C. (1961). *Estimation with Quadratic Loss*. Proceedings of the Fourth Berkeley Symposium.
-
-### Industry Reports
-1. Basketball Reference. *Defensive Rating Methodology*. https://www.basketball-reference.com
-2. Cleaning the Glass. *Position-Adjusted Defensive Metrics*. https://cleaningtheglass.com
-3. ESPN. *Real Plus-Minus (RPM) Explainer*. http://www.espn.com/nba/statistics/rpm
