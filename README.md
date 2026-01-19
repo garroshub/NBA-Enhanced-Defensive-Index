@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[![Live Dashboard](https://img.shields.io/badge/🌐_View-Live_Dashboard-emerald?style=for-the-badge)](https://garroshub.github.io/NBA-Defensive-Index/)
+[![Live Dashboard](https://img.shields.io/badge/🌐_View-Live_Dashboard-emerald?style=for-the-badge)]([https://garroshub.github.io/NBA-Defensive-Index/](https://garroshub.github.io/NBA-Enhanced-Defensive-Index/))
 [![Technical Report](https://img.shields.io/badge/📄_Read-Technical_Report-blue?style=for-the-badge)](reports/NBA_EDI_Defense_Report.md)
 
 </div>
