@@ -37,7 +37,7 @@ WEB_DATA_DIR = BASE_DIR / "web" / "lib"
 EXISTING_DATA_PATH = WEB_DATA_DIR / "data.json"
 
 # Season configuration
-HISTORICAL_SEASONS = ["2023-24", "2022-23", "2021-22", "2020-21"]
+HISTORICAL_SEASONS = ["2024-25", "2023-24", "2022-23", "2021-22"]
 GAMES_PER_SEASON = 82
 
 # Dynamic shrinkage constants
