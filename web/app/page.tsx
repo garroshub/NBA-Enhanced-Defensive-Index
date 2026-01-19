@@ -26,7 +26,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <Shield className="w-10 h-10 text-emerald-500" />
               <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                NBA Defensive Index
+                NBA Enhanced Defensive Index
               </h1>
             </div>
             <Link 

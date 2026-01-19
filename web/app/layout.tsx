@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NBA Defensive Index | Elite Defensive Metrics",
-  description: "Advanced NBA defensive statistics and rankings using the Elite Defensive Index (EDI) metric.",
+  title: "NBA Enhanced Defensive Index | EDI",
+  description: "Advanced NBA defensive statistics and rankings using the Enhanced Defensive Index (EDI) - a 5-dimensional Bayesian framework.",
 };
 
 export default function RootLayout({

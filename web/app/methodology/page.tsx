@@ -188,15 +188,15 @@ export default function Methodology() {
                       <span className="text-xs text-gray-500 ml-2">NBA Official</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-xl font-medium text-gray-400">1</span>
+                      <span className="text-xl font-medium text-gray-400">9</span>
                       <span className="text-gray-600">/50</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-xl font-medium text-gray-400">1</span>
+                      <span className="text-xl font-medium text-gray-400">16</span>
                       <span className="text-gray-600">/50</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-xl font-medium text-gray-400">3</span>
+                      <span className="text-xl font-medium text-gray-400">23</span>
                       <span className="text-gray-600">/50</span>
                     </td>
                   </tr>
@@ -206,15 +206,15 @@ export default function Methodology() {
                       <span className="text-xs text-gray-500 ml-2">NBA Official</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-xl font-medium text-gray-400">1</span>
+                      <span className="text-xl font-medium text-gray-400">11</span>
                       <span className="text-gray-600">/50</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-xl font-medium text-gray-400">3</span>
+                      <span className="text-xl font-medium text-gray-400">24</span>
                       <span className="text-gray-600">/50</span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="text-xl font-medium text-gray-400">4</span>
+                      <span className="text-xl font-medium text-gray-400">29</span>
                       <span className="text-gray-600">/50</span>
                     </td>
                   </tr>
@@ -230,9 +230,9 @@ export default function Methodology() {
                 <TrendingUp className="w-8 h-8 text-emerald-400" />
               </div>
               <div>
-                <h4 className="text-xl font-bold text-white mb-2">10x Better Coverage</h4>
+                <h4 className="text-xl font-bold text-white mb-2">Superior Coverage</h4>
                 <p className="text-gray-300">
-                  EDI identifies <span className="text-emerald-400 font-bold">10 times more</span> All-Defensive Team players than official NBA metrics in the Top 30 rankings. This demonstrates that the multi-dimensional approach captures defensive value that single-number metrics miss.
+                  EDI identifies <span className="text-emerald-400 font-bold">32 out of 50</span> All-Defensive Team players in the Top 30 rankings, outperforming DEF_RATING (23/50) and DEF_WS (29/50). This demonstrates that the multi-dimensional approach captures defensive value that single-number metrics miss.
                 </p>
               </div>
             </div>
