@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'export',
-  basePath: '/NBA-Defensive-Index',
+  basePath: '/NBA-Enhanced-Defensive-Index',
   images: {
     unoptimized: true,
   },
