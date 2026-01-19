@@ -187,7 +187,7 @@ $$\text{EDI} = \frac{\sum (D_i \times W_i) + \text{SynergyBonus}}{\sum W_i} \tim
 
 <div align="center">
 
-**Report Generated:** 2026-01-17  
+**Last Updated:** January 2026  
 **Data Sources:** NBA Stats API (Official Tracking Data)
 
 </div>
