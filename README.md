@@ -10,6 +10,7 @@
 
 [![Live Dashboard](https://img.shields.io/badge/🌐_View-Live_Dashboard-emerald?style=for-the-badge)](https://garroshub.github.io/NBA-Enhanced-Defensive-Index/)
 [![Technical Report](https://img.shields.io/badge/📄_Read-Technical_Report-blue?style=for-the-badge)](reports/NBA_EDI_Defense_Report.md)
+[![Discussions](https://img.shields.io/badge/💬_Join-Discussions-0b5fff?style=for-the-badge)](https://github.com/garroshub/NBA-Enhanced-Defensive-Index/discussions)
 
 </div>
 
@@ -93,11 +94,11 @@ This repository is updated weekly with the latest NBA tracking data. Each update
 
 ## Star History
 
-<a href="https://star-history.com/#garroshub/NBA-Defensive-Index&Date">
+<a href="https://star-history.com/#garroshub/NBA-Enhanced-Defensive-Index&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=garroshub/NBA-Defensive-Index&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=garroshub/NBA-Defensive-Index&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=garroshub/NBA-Defensive-Index&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=garroshub/NBA-Enhanced-Defensive-Index&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=garroshub/NBA-Enhanced-Defensive-Index&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=garroshub/NBA-Enhanced-Defensive-Index&type=Date" />
  </picture>
 </a>
 
