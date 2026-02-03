@@ -43,10 +43,11 @@ function LoadingFallback() {
   );
 }
 
-export default function PlayerPage({ params }: { params: { id: string } }) {
+export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <PlayerDetail id={parseInt(params.id)} />
+      <PlayerDetail id={parseInt(resolvedParams.id)} />
     </Suspense>
   );
 }
