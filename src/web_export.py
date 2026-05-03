@@ -1,22 +1,4 @@
-"""
-NBA EDI Web Export Module
-=========================
-Generates JSON data for the React frontend application.
-
-This module imports the core analysis logic from nba_defense_mvp.py
-and transforms the output into a web-friendly JSON format.
-
-Features:
-- Multi-season support (current + 4 historical seasons)
-- Dynamic Bayesian shrinkage based on season progress
-- Dynamic Sigmoid availability adjustment for partial seasons
-- Trend tracking (daily changes in EDI and ranks)
-- Confidence indicators for sample size transparency
-
-Usage:
-    python src/web_export.py                    # Generate all seasons
-    python src/web_export.py --current-only     # Generate current season only
-"""
+"""Build the JSON bundle used by the web dashboard."""
 
 import json
 import sys
@@ -41,34 +23,21 @@ HISTORICAL_SEASONS = ["2024-25", "2023-24", "2022-23", "2021-22"]
 GAMES_PER_SEASON = 82
 
 # Dynamic shrinkage constants
-C_MIN = 20  # Minimum shrinkage (early season, allow more variance)
-C_MAX = 60  # Maximum shrinkage (full season, standard robustness)
-C_RAMP_FACTOR = 2.0  # How quickly C ramps up (reaches C_MAX at 50% season)
+C_MIN = 20
+C_MAX = 60
+C_RAMP_FACTOR = 2.0
 
 # Synergy Bonus thresholds (must match nba_defense_mvp.py)
 SYNERGY_D1_THRESHOLD = 0.80
 SYNERGY_D2_THRESHOLD = 0.75
 SYNERGY_FACTOR = 0.5
 
-# =============================================================================
-# Partial Season Adjustment Model
-# =============================================================================
-# For partial seasons, we use a simplified "pure performance" approach:
-# 1. Dynamic MIN_GP threshold filters out small samples
-# 2. Players meeting threshold are evaluated equally (no ironman bonus)
-# 3. Bayesian Efficiency Stabilization shrinks extreme efficiency values
-#    toward 1.0 for players with fewer games (small sample correction)
-#
-# This ensures fair evaluation without arbitrary bonuses during the season.
-# =============================================================================
-
 # Threshold parameters
-MIN_GP_RATIO = 0.40  # Minimum games = max_gp * 0.40 (e.g., 44 * 0.40 = 17.6 -> 18)
-MIN_GP_FLOOR = 10  # Absolute minimum to avoid edge cases in very early season
+MIN_GP_RATIO = 0.40
+MIN_GP_FLOOR = 10
 
 # Bayesian Efficiency Stabilization
-# Shrinks extreme efficiency values toward league average (1.0) for small samples
-EFFICIENCY_SHRINKAGE_K = 10  # Equivalent "prior" games at league average efficiency
+EFFICIENCY_SHRINKAGE_K = 10
 
 
 def calculate_dynamic_min_gp(max_gp: int) -> int:

@@ -1,15 +1,4 @@
-"""External advanced metrics fetcher for model validation.
-
-This module fetches external high-level defensive metrics from public sources
-to validate the EDI model against independent measurements.
-
-Supported Sources:
-1. FiveThirtyEight RAPTOR (D-RAPTOR) - GitHub CSV
-2. Basketball Reference D-BPM - Website scraping
-
-Note: These metrics provide independent validation that our EDI model
-captures similar signal to professionally-developed metrics.
-"""
+"""Fetch public third-party defensive metrics for validation."""
 
 import io
 import re

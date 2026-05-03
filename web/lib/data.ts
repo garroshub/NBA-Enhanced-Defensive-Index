@@ -1,7 +1,6 @@
 import { DataFile, Player } from './types';
 import rawData from './data.json';
 
-// Bundled data - imported at build time, guaranteed to exist
 const data: DataFile = rawData as DataFile;
 
 export function getData(): DataFile {

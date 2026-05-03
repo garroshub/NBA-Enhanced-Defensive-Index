@@ -2,7 +2,6 @@ import { getPlayers, getSeasons } from '@/lib/data';
 import PlayerDetail from '@/components/PlayerDetail';
 import { Suspense } from 'react';
 
-// Generate static params for all players across all seasons
 export function generateStaticParams() {
   try {
     const seasons = getSeasons();
@@ -17,9 +16,6 @@ export function generateStaticParams() {
       id: id,
     }));
 
-    // If no data is available (e.g. during initial build before data generation),
-    // return a dummy path to satisfy Next.js 'output: export' requirement.
-    // This page will render the "Player Not Found" state.
     if (params.length === 0) {
       console.warn('No player data found during build. Generating fallback path.');
       return [{ id: '0' }];
@@ -28,7 +24,6 @@ export function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error in generateStaticParams:', error);
-    // Fallback on error as well
     return [{ id: '0' }];
   }
 }

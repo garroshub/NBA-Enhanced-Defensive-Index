@@ -1,28 +1,4 @@
-"""Evaluation metrics for defensive analysis model.
-
-This module provides comprehensive evaluation of the EDI model against
-All-Defensive Team selections using three dimensions:
-
-1. Tier Alignment (梯队重合度)
-   - Average rank of All-Defense players in model rankings
-   - Lower is better (ideal: ~5.5 for top 10)
-
-2. Candidate Pool Quality (候选池质量)
-   - Recall@K: What % of All-Defense players appear in model's top K?
-   - Higher is better (measures if model identifies the right pool)
-
-3. Miss Analysis (遗漏偏差分析)
-   - Average rank of missed players
-   - Classifies misses as "near-miss" (rank 11-20) vs "model blind spot" (rank 30+)
-
-Additional validations:
-- Correlation with advanced stats (D-EPM if available)
-- Cross-season stability analysis
-
-Evaluation Logic by Era:
-- Pre-2023-24: Position-based (4G + 4F + 2C)
-- 2023-24+: Positionless top 10, 65-game minimum
-"""
+"""Evaluate EDI against All-Defensive team results."""
 
 from dataclasses import dataclass
 from typing import Any

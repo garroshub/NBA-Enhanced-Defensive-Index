@@ -1,20 +1,4 @@
-"""External defensive metrics fetcher for EDI model validation.
-
-This module provides utilities to fetch official NBA defensive metrics
-(DEF_RATING, DEF_WS) for external validation of the EDI model.
-
-Data Sources:
-- NBA Official API (nba.com/stats): DEF_RATING, DEF_WS
-  - DEF_RATING: Defensive Rating (points allowed per 100 possessions)
-  - DEF_WS: Defensive Win Shares (cumulative defensive contribution)
-
-Usage:
-    # Fetch official NBA metrics for a season
-    df = fetch_official_defensive_metrics("2023-24")
-
-    # Compare with EDI model
-    report = generate_external_comparison_report(edi_df, "2023-24")
-"""
+"""Fetch official NBA defensive metrics for EDI validation."""
 
 import time
 from pathlib import Path

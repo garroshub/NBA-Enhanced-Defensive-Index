@@ -24,7 +24,7 @@ export default function PlayerTable({ players, season }: PlayerTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
-  const isCurrentSeason = season === '2025-26'; // TODO: Make this dynamic based on metadata
+  const isCurrentSeason = season === '2025-26';
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

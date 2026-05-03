@@ -11,7 +11,6 @@
 # --- Keep Documentation & Specific Assets ---
 !README.md
 !LICENSE
-!AGENTS.md
 !reports/
 !reports/NBA_EDI_Defense_Report.md
 !figures/
@@ -35,3 +34,14 @@ __pycache__/
 venv/
 env/
 data/
+
+# --- Keep AI / local workflow files out of git ---
+AGENTS.md
+CONTEXT.md
+ARCHITECTURE.md
+lessons.md
+task_plan.md
+progress.md
+findings.md
+docs/plans/
+.opencode/

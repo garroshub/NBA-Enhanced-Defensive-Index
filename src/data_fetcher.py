@@ -1,11 +1,4 @@
-"""Data fetching utilities for NBA defensive evaluation.
-
-This module provides functions to fetch All-Defensive Team rosters,
-DPOY winners, and player award status for model evaluation.
-
-Uses nba_api.stats.endpoints.playerawards for dynamic queries,
-with static cache for batch operations.
-"""
+"""Data helpers for awards and All-Defensive team lookups."""
 
 import time
 from typing import Optional
