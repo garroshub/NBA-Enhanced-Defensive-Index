@@ -22,6 +22,26 @@ EXISTING_DATA_PATH = WEB_DATA_DIR / "data.json"
 HISTORICAL_SEASONS = ["2024-25", "2023-24", "2022-23", "2021-22"]
 GAMES_PER_SEASON = 82
 
+OFFICIAL_ALL_DEFENSIVE_TEAMS = {
+    "2025-26": {
+        "source": "NBA All-Defensive Teams, announced May 2026",
+        "first_team": [
+            "Victor Wembanyama",
+            "Chet Holmgren",
+            "Ausar Thompson",
+            "Rudy Gobert",
+            "Derrick White",
+        ],
+        "second_team": [
+            "Bam Adebayo",
+            "Cason Wallace",
+            "OG Anunoby",
+            "Scottie Barnes",
+            "Dyson Daniels",
+        ],
+    }
+}
+
 # Dynamic shrinkage constants
 C_MIN = 20
 C_MAX = 60
@@ -358,6 +378,87 @@ def calculate_trends(
     return current_players
 
 
+def build_all_defensive_comparison(season: str, players: list[dict]) -> Optional[dict]:
+    """
+    Compare EDI rankings with the official NBA All-Defensive selections.
+
+    Returns a compact summary for the web dashboard. The official list is kept
+    explicit because NBA award teams are discrete editorial/voting outcomes, not
+    a field available from the stats endpoints used by the model.
+    """
+    official = OFFICIAL_ALL_DEFENSIVE_TEAMS.get(season)
+    if not official:
+        return None
+
+    all_defensive_names = official["first_team"] + official["second_team"]
+    official_name_set = set(all_defensive_names)
+    player_by_name = {player["name"]: player for player in players}
+
+    matched_players = []
+    missing_players = []
+    for team_name, names in (
+        ("First Team", official["first_team"]),
+        ("Second Team", official["second_team"]),
+    ):
+        for name in names:
+            player = player_by_name.get(name)
+            if player:
+                matched_players.append(
+                    {
+                        "name": name,
+                        "team": player["team"],
+                        "official_team": team_name,
+                        "edi_rank": player["ranks"]["overall"],
+                        "edi": player["scores"]["edi"],
+                    }
+                )
+            else:
+                missing_players.append({"name": name, "official_team": team_name})
+
+    top_10 = players[:10]
+    top_15 = players[:15]
+    top_30 = players[:30]
+
+    def count_hits(candidate_players: list[dict]) -> int:
+        return sum(1 for player in candidate_players if player["name"] in official_name_set)
+
+    top_10_hits = count_hits(top_10)
+    top_15_hits = count_hits(top_15)
+    top_30_hits = count_hits(top_30)
+
+    return {
+        "season": season,
+        "source": official["source"],
+        "official_count": len(all_defensive_names),
+        "top_10_hits": top_10_hits,
+        "top_10_hit_rate": round(top_10_hits / len(all_defensive_names), 2),
+        "top_15_hits": top_15_hits,
+        "top_15_hit_rate": round(top_15_hits / len(all_defensive_names), 2),
+        "top_30_hits": top_30_hits,
+        "top_30_hit_rate": round(top_30_hits / len(all_defensive_names), 2),
+        "top_10": [
+            {
+                "rank": player["ranks"]["overall"],
+                "name": player["name"],
+                "team": player["team"],
+                "edi": player["scores"]["edi"],
+                "official_team": (
+                    "First Team"
+                    if player["name"] in official["first_team"]
+                    else "Second Team"
+                    if player["name"] in official["second_team"]
+                    else None
+                ),
+            }
+            for player in top_10
+        ],
+        "official_players": sorted(
+            matched_players, key=lambda player: player["edi_rank"]
+        ),
+        "missing_players": missing_players,
+    }
+
+
 def format_player_for_web(row: pd.Series, rank: int) -> dict:
     """
     Transform a DataFrame row into web-friendly JSON structure.
@@ -493,6 +594,7 @@ def generate_season_data(
         "season_progress": round(season_progress, 2),
         "dynamic_c": round(dynamic_c, 1),
         "is_current": is_current,
+        "is_final": season_progress >= 1.0,
     }
 
     print(f"Processed {len(players)} players")
@@ -554,6 +656,9 @@ def generate_all_data(current_only: bool = False) -> dict:
 
             output["seasons"][season] = players
             output["meta"][f"{season}_info"] = metadata
+            comparison = build_all_defensive_comparison(season, players)
+            if comparison:
+                output["meta"][f"{season}_all_defensive_comparison"] = comparison
 
     return output
 

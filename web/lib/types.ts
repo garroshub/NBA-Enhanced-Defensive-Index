@@ -22,7 +22,7 @@ export interface PlayerStats {
 export interface PlayerTrend {
   edi_change: number | null;
   rank_change: number | null;
-  status: 'up' | 'down' | 'same' | 'new';
+  status: 'up' | 'down' | 'stable' | 'new';
 }
 
 export interface Player {
@@ -35,7 +35,7 @@ export interface Player {
   ranks: PlayerRanks;
   stats: PlayerStats;
   confidence: 'high' | 'medium' | 'low';
-  trend: PlayerTrend;
+  trend?: PlayerTrend;
 }
 
 export interface SeasonMetadata {
@@ -44,7 +44,32 @@ export interface SeasonMetadata {
   season_progress: number;
   dynamic_c: number;
   is_current: boolean;
+  is_final?: boolean;
   generated_at?: string;
+}
+
+export interface AllDefensiveComparisonPlayer {
+  name: string;
+  team: string | null;
+  official_team?: 'First Team' | 'Second Team' | null;
+  edi_rank?: number;
+  edi: number;
+  rank?: number;
+}
+
+export interface AllDefensiveComparison {
+  season: string;
+  source: string;
+  official_count: number;
+  top_10_hits: number;
+  top_10_hit_rate: number;
+  top_15_hits: number;
+  top_15_hit_rate: number;
+  top_30_hits: number;
+  top_30_hit_rate: number;
+  top_10: AllDefensiveComparisonPlayer[];
+  official_players: AllDefensiveComparisonPlayer[];
+  missing_players: Array<{ name: string; official_team: string }>;
 }
 
 export interface SeasonData {

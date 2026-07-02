@@ -1,7 +1,7 @@
-import { DataFile, Player } from './types';
+import { AllDefensiveComparison, DataFile, Player } from './types';
 import rawData from './data.json';
 
-const data: DataFile = rawData as DataFile;
+const data: DataFile = rawData as unknown as DataFile;
 
 export function getData(): DataFile {
   return data;
@@ -34,5 +34,11 @@ export function getSeasonInfo(season: string) {
     season_progress: number;
     dynamic_c: number;
     is_current: boolean;
+    is_final?: boolean;
   } | undefined;
+}
+
+export function getAllDefensiveComparison(season: string): AllDefensiveComparison | undefined {
+  const key = `${season}_all_defensive_comparison`;
+  return data.meta[key] as AllDefensiveComparison | undefined;
 }

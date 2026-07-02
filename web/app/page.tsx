@@ -1,4 +1,4 @@
-import { getPlayers, getSeasons, getMeta, getSeasonInfo } from '@/lib/data';
+import { getPlayers, getSeasons, getMeta, getSeasonInfo, getAllDefensiveComparison } from '@/lib/data';
 import Dashboard from '@/components/Dashboard';
 import { Shield } from 'lucide-react';
 import Link from 'next/link';
@@ -9,12 +9,17 @@ export default function Home() {
   const meta = getMeta();
   
   const allData: Record<string, any[]> = {};
-  const seasonInfoMap: Record<string, { max_games_played: number }> = {};
+  const seasonInfoMap: Record<string, { max_games_played: number; is_final?: boolean }> = {};
+  const allDefensiveComparisonMap: Record<string, any> = {};
   for (const season of seasons) {
     allData[season] = getPlayers(season);
     const info = getSeasonInfo(season);
     if (info) {
-      seasonInfoMap[season] = { max_games_played: info.max_games_played };
+      seasonInfoMap[season] = { max_games_played: info.max_games_played, is_final: info.is_final };
+    }
+    const comparison = getAllDefensiveComparison(season);
+    if (comparison) {
+      allDefensiveComparisonMap[season] = comparison;
     }
   }
 
@@ -48,6 +53,7 @@ export default function Home() {
           allData={allData}
           generatedAt={meta.generated_at}
           seasonInfoMap={seasonInfoMap}
+          allDefensiveComparisonMap={allDefensiveComparisonMap}
         />
       </div>
     </main>
