@@ -52,14 +52,21 @@ export interface AllDefensiveComparisonPlayer {
   name: string;
   team: string | null;
   official_team?: 'First Team' | 'Second Team' | null;
-  edi_rank?: number;
+  raw_edi_rank?: number;
+  eligibility_rank?: number;
   edi: number;
-  rank?: number;
 }
 
 export interface AllDefensiveComparison {
   season: string;
   source: string;
+  eligibility_filter: {
+    min_gp: number;
+    min_mpg_proxy: number;
+    official_selections_retained: boolean;
+  };
+  eligibility_note: string;
+  eligible_player_count: number;
   official_count: number;
   top_10_hits: number;
   top_10_hit_rate: number;
@@ -69,6 +76,14 @@ export interface AllDefensiveComparison {
   top_30_hit_rate: number;
   top_10: AllDefensiveComparisonPlayer[];
   official_players: AllDefensiveComparisonPlayer[];
+  ineligible_high_scores: Array<{
+    raw_edi_rank: number;
+    name: string;
+    team: string | null;
+    gp: number;
+    mpg: number;
+    edi: number;
+  }>;
   missing_players: Array<{ name: string; official_team: string }>;
 }
 

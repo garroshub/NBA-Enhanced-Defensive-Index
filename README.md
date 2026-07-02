@@ -43,6 +43,35 @@ EDI leads the comparison at all three cutoffs.
 
 ---
 
+## 2025-26 All-Defensive Check
+
+The 2025-26 dashboard is updated through the completed 82-game regular season. For the All-Defensive comparison, EDI uses an awards-eligibility proxy: **65+ games played and 20+ minutes per game**, while retaining actual official selections to reflect league exceptions and credited-game rules that are not stored in the public season-level export.
+
+| Award-eligible EDI cutoff | Official All-Defensive players captured |
+|---------------------------|------------------------------------------|
+| Top 10 | **6 / 10** |
+| Top 15 | **7 / 10** |
+| Top 30 | **10 / 10** |
+
+Award-eligible EDI Top 10:
+
+| Rank | Player | Team | EDI | Official result |
+|------|--------|------|-----|-----------------|
+| 1 | Chet Holmgren | OKC | 117.0 | First Team |
+| 2 | Ausar Thompson | DET | 114.8 | First Team |
+| 3 | Victor Wembanyama | SAS | 113.0 | First Team |
+| 4 | Evan Mobley | CLE | 108.7 | Not selected |
+| 5 | Brook Lopez | LAC | 108.2 | Not selected |
+| 6 | Rudy Gobert | MIN | 104.8 | First Team |
+| 7 | Dyson Daniels | ATL | 104.1 | Second Team |
+| 8 | Cason Wallace | OKC | 102.8 | Second Team |
+| 9 | Jaden McDaniels | MIN | 102.7 | Not selected |
+| 10 | Draymond Green | GSW | 100.4 | Not selected |
+
+All ten official All-Defensive selections rank inside EDI's award-eligible Top 30.
+
+---
+
 ## Project Layout
 
 - `src/`: Python model, evaluation, and export scripts

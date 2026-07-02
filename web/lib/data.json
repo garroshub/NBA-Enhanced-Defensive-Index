@@ -49,6 +49,13 @@
     "2025-26_all_defensive_comparison": {
       "season": "2025-26",
       "source": "NBA All-Defensive Teams, announced May 2026",
+      "eligibility_filter": {
+        "min_gp": 65,
+        "min_mpg_proxy": 20.0,
+        "official_selections_retained": true
+      },
+      "eligibility_note": "Comparison ranks use an awards-eligibility proxy: GP >= 65 and MPG >= 20, while retaining actual official selections to reflect league exceptions and credited-game rules not stored in the web export.",
+      "eligible_player_count": 143,
       "official_count": 10,
       "top_10_hits": 6,
       "top_10_hit_rate": 0.6,
@@ -58,73 +65,83 @@
       "top_30_hit_rate": 1.0,
       "top_10": [
         {
-          "rank": 1,
+          "eligibility_rank": 1,
+          "raw_edi_rank": 1,
           "name": "Chet Holmgren",
           "team": "OKC",
           "edi": 117.0,
           "official_team": "First Team"
         },
         {
-          "rank": 2,
+          "eligibility_rank": 2,
+          "raw_edi_rank": 2,
           "name": "Ausar Thompson",
           "team": "DET",
           "edi": 114.8,
           "official_team": "First Team"
         },
         {
-          "rank": 3,
+          "eligibility_rank": 3,
+          "raw_edi_rank": 3,
           "name": "Victor Wembanyama",
           "team": "SAS",
           "edi": 113.0,
           "official_team": "First Team"
         },
         {
-          "rank": 4,
+          "eligibility_rank": 4,
+          "raw_edi_rank": 4,
           "name": "Evan Mobley",
           "team": "CLE",
           "edi": 108.7,
           "official_team": null
         },
         {
-          "rank": 5,
+          "eligibility_rank": 5,
+          "raw_edi_rank": 5,
           "name": "Brook Lopez",
           "team": "LAC",
           "edi": 108.2,
           "official_team": null
         },
         {
-          "rank": 6,
+          "eligibility_rank": 6,
+          "raw_edi_rank": 6,
           "name": "Rudy Gobert",
           "team": "MIN",
           "edi": 104.8,
           "official_team": "First Team"
         },
         {
-          "rank": 7,
+          "eligibility_rank": 7,
+          "raw_edi_rank": 7,
           "name": "Dyson Daniels",
           "team": "ATL",
           "edi": 104.1,
           "official_team": "Second Team"
         },
         {
-          "rank": 8,
+          "eligibility_rank": 8,
+          "raw_edi_rank": 8,
           "name": "Cason Wallace",
           "team": "OKC",
           "edi": 102.8,
           "official_team": "Second Team"
         },
         {
-          "rank": 9,
+          "eligibility_rank": 9,
+          "raw_edi_rank": 9,
           "name": "Jaden McDaniels",
           "team": "MIN",
           "edi": 102.7,
           "official_team": null
         },
         {
-          "rank": 10,
-          "name": "Jaylin Williams",
-          "team": "OKC",
-          "edi": 101.9,
+          "eligibility_rank": 10,
+          "raw_edi_rank": 11,
+          "name": "Draymond Green",
+          "team": "GSW",
+          "edi": 100.4,
           "official_team": null
         }
       ],
@@ -133,71 +150,139 @@
           "name": "Chet Holmgren",
           "team": "OKC",
           "official_team": "First Team",
-          "edi_rank": 1,
+          "raw_edi_rank": 1,
+          "eligibility_rank": 1,
           "edi": 117.0
         },
         {
           "name": "Ausar Thompson",
           "team": "DET",
           "official_team": "First Team",
-          "edi_rank": 2,
+          "raw_edi_rank": 2,
+          "eligibility_rank": 2,
           "edi": 114.8
         },
         {
           "name": "Victor Wembanyama",
           "team": "SAS",
           "official_team": "First Team",
-          "edi_rank": 3,
+          "raw_edi_rank": 3,
+          "eligibility_rank": 3,
           "edi": 113.0
         },
         {
           "name": "Rudy Gobert",
           "team": "MIN",
           "official_team": "First Team",
-          "edi_rank": 6,
+          "raw_edi_rank": 6,
+          "eligibility_rank": 6,
           "edi": 104.8
         },
         {
           "name": "Dyson Daniels",
           "team": "ATL",
           "official_team": "Second Team",
-          "edi_rank": 7,
+          "raw_edi_rank": 7,
+          "eligibility_rank": 7,
           "edi": 104.1
         },
         {
           "name": "Cason Wallace",
           "team": "OKC",
           "official_team": "Second Team",
-          "edi_rank": 8,
+          "raw_edi_rank": 8,
+          "eligibility_rank": 8,
           "edi": 102.8
         },
         {
           "name": "Derrick White",
           "team": "BOS",
           "official_team": "First Team",
-          "edi_rank": 13,
+          "raw_edi_rank": 13,
+          "eligibility_rank": 12,
           "edi": 93.0
         },
         {
           "name": "Bam Adebayo",
           "team": "MIA",
           "official_team": "Second Team",
-          "edi_rank": 23,
+          "raw_edi_rank": 23,
+          "eligibility_rank": 19,
           "edi": 87.2
         },
         {
           "name": "Scottie Barnes",
           "team": "TOR",
           "official_team": "Second Team",
-          "edi_rank": 25,
+          "raw_edi_rank": 25,
+          "eligibility_rank": 21,
           "edi": 86.4
         },
         {
           "name": "OG Anunoby",
           "team": "NYK",
           "official_team": "Second Team",
-          "edi_rank": 28,
+          "raw_edi_rank": 28,
+          "eligibility_rank": 23,
           "edi": 83.5
+        }
+      ],
+      "ineligible_high_scores": [
+        {
+          "raw_edi_rank": 10,
+          "name": "Jaylin Williams",
+          "team": "OKC",
+          "gp": 65,
+          "mpg": 19.7,
+          "edi": 101.9
+        },
+        {
+          "raw_edi_rank": 14,
+          "name": "Yves Missi",
+          "team": "NOP",
+          "gp": 66,
+          "mpg": 19.7,
+          "edi": 92.9
+        },
+        {
+          "raw_edi_rank": 16,
+          "name": "Robert Williams III",
+          "team": "POR",
+          "gp": 59,
+          "mpg": 17.1,
+          "edi": 91.8
+        },
+        {
+          "raw_edi_rank": 17,
+          "name": "Mouhamed Gueye",
+          "team": "ATL",
+          "gp": 77,
+          "mpg": 15.3,
+          "edi": 91.5
+        },
+        {
+          "raw_edi_rank": 27,
+          "name": "Isaac Okoro",
+          "team": "CHI",
+          "gp": 63,
+          "mpg": 26.9,
+          "edi": 84.0
+        },
+        {
+          "raw_edi_rank": 29,
+          "name": "Jarrett Allen",
+          "team": "CLE",
+          "gp": 56,
+          "mpg": 27.1,
+          "edi": 83.4
+        },
+        {
+          "raw_edi_rank": 30,
+          "name": "Marcus Smart",
+          "team": "LAL",
+          "gp": 62,
+          "mpg": 28.5,
+          "edi": 83.3
         }
       ],
       "missing_players": []

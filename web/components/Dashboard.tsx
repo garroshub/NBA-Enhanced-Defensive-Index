@@ -99,6 +99,9 @@ export default function Dashboard({
               <h2 className="mt-1 text-2xl font-semibold text-white">
                 {comparison.season} EDI vs NBA All-Defensive Teams
               </h2>
+              <p className="mt-1 max-w-3xl text-sm text-gray-400">
+                Award-eligible comparison uses GP &gt;= {comparison.eligibility_filter.min_gp} and MPG &gt;= {comparison.eligibility_filter.min_mpg_proxy.toFixed(0)} as a public-data proxy, while retaining official selections for league exceptions.
+              </p>
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="rounded-md border border-gray-800 bg-gray-950/70 px-3 py-2">
@@ -126,12 +129,12 @@ export default function Dashboard({
             <div className="overflow-hidden rounded-lg border border-gray-800">
               <div className="flex items-center gap-2 border-b border-gray-800 bg-gray-950/80 px-4 py-3 text-sm font-medium text-gray-300">
                 <Target className="h-4 w-4 text-emerald-400" />
-                EDI Top 10
+                Award-Eligible EDI Top 10
               </div>
               <div className="divide-y divide-gray-800">
                 {comparison.top_10.map((player) => (
                   <div key={player.name} className="grid grid-cols-[48px_1fr_76px_120px] items-center gap-3 px-4 py-2 text-sm">
-                    <span className="text-gray-500">#{player.rank}</span>
+                    <span className="text-gray-500">#{player.eligibility_rank}</span>
                     <span className="font-medium text-gray-100">{player.name}</span>
                     <span className="text-right font-semibold text-emerald-400">{player.edi.toFixed(1)}</span>
                     <span className={player.official_team ? 'text-cyan-300' : 'text-gray-600'}>
@@ -150,7 +153,7 @@ export default function Dashboard({
               <div className="divide-y divide-gray-800">
                 {comparison.official_players.map((player) => (
                   <div key={player.name} className="grid grid-cols-[48px_1fr_76px] items-center gap-3 px-4 py-2 text-sm">
-                    <span className="text-gray-500">#{player.edi_rank}</span>
+                    <span className="text-gray-500">#{player.eligibility_rank}</span>
                     <span>
                       <span className="font-medium text-gray-100">{player.name}</span>
                       <span className="ml-2 text-xs text-gray-500">{player.official_team}</span>

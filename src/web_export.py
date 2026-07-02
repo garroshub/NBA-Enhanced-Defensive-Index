@@ -21,6 +21,8 @@ EXISTING_DATA_PATH = WEB_DATA_DIR / "data.json"
 # Season configuration
 HISTORICAL_SEASONS = ["2024-25", "2023-24", "2022-23", "2021-22"]
 GAMES_PER_SEASON = 82
+AWARD_MIN_GP = 65
+AWARD_MIN_MPG = 20.0
 
 OFFICIAL_ALL_DEFENSIVE_TEAMS = {
     "2025-26": {
@@ -394,6 +396,22 @@ def build_all_defensive_comparison(season: str, players: list[dict]) -> Optional
     official_name_set = set(all_defensive_names)
     player_by_name = {player["name"]: player for player in players}
 
+    def is_award_eligible_proxy(player: dict) -> bool:
+        stats = player.get("stats", {})
+        gp = stats.get("gp") or 0
+        mpg = stats.get("min") or 0
+        meets_proxy = gp >= AWARD_MIN_GP and mpg >= AWARD_MIN_MPG
+        # Official selections are retained because the public web export stores
+        # season-level GP/MPG, not credited-game counts or league exceptions.
+        return meets_proxy or player["name"] in official_name_set
+
+    eligible_players = [
+        player for player in players if is_award_eligible_proxy(player)
+    ]
+    eligible_rank_by_name = {
+        player["name"]: rank for rank, player in enumerate(eligible_players, start=1)
+    }
+
     matched_players = []
     missing_players = []
     for team_name, names in (
@@ -408,16 +426,17 @@ def build_all_defensive_comparison(season: str, players: list[dict]) -> Optional
                         "name": name,
                         "team": player["team"],
                         "official_team": team_name,
-                        "edi_rank": player["ranks"]["overall"],
+                        "raw_edi_rank": player["ranks"]["overall"],
+                        "eligibility_rank": eligible_rank_by_name.get(name),
                         "edi": player["scores"]["edi"],
                     }
                 )
             else:
                 missing_players.append({"name": name, "official_team": team_name})
 
-    top_10 = players[:10]
-    top_15 = players[:15]
-    top_30 = players[:30]
+    top_10 = eligible_players[:10]
+    top_15 = eligible_players[:15]
+    top_30 = eligible_players[:30]
 
     def count_hits(candidate_players: list[dict]) -> int:
         return sum(1 for player in candidate_players if player["name"] in official_name_set)
@@ -429,6 +448,17 @@ def build_all_defensive_comparison(season: str, players: list[dict]) -> Optional
     return {
         "season": season,
         "source": official["source"],
+        "eligibility_filter": {
+            "min_gp": AWARD_MIN_GP,
+            "min_mpg_proxy": AWARD_MIN_MPG,
+            "official_selections_retained": True,
+        },
+        "eligibility_note": (
+            "Comparison ranks use an awards-eligibility proxy: GP >= 65 and "
+            "MPG >= 20, while retaining actual official selections to reflect "
+            "league exceptions and credited-game rules not stored in the web export."
+        ),
+        "eligible_player_count": len(eligible_players),
         "official_count": len(all_defensive_names),
         "top_10_hits": top_10_hits,
         "top_10_hit_rate": round(top_10_hits / len(all_defensive_names), 2),
@@ -438,7 +468,8 @@ def build_all_defensive_comparison(season: str, players: list[dict]) -> Optional
         "top_30_hit_rate": round(top_30_hits / len(all_defensive_names), 2),
         "top_10": [
             {
-                "rank": player["ranks"]["overall"],
+                "eligibility_rank": eligible_rank_by_name[player["name"]],
+                "raw_edi_rank": player["ranks"]["overall"],
                 "name": player["name"],
                 "team": player["team"],
                 "edi": player["scores"]["edi"],
@@ -453,8 +484,20 @@ def build_all_defensive_comparison(season: str, players: list[dict]) -> Optional
             for player in top_10
         ],
         "official_players": sorted(
-            matched_players, key=lambda player: player["edi_rank"]
+            matched_players, key=lambda player: player["eligibility_rank"] or 999
         ),
+        "ineligible_high_scores": [
+            {
+                "raw_edi_rank": player["ranks"]["overall"],
+                "name": player["name"],
+                "team": player["team"],
+                "gp": player["stats"]["gp"],
+                "mpg": player["stats"]["min"],
+                "edi": player["scores"]["edi"],
+            }
+            for player in players[:30]
+            if not is_award_eligible_proxy(player)
+        ],
         "missing_players": missing_players,
     }
 
