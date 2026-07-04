@@ -15,6 +15,12 @@
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=garroshub/NBA-Enhanced-Defensive-Index&type=Date)](https://www.star-history.com/#garroshub/NBA-Enhanced-Defensive-Index&Date)
+
+---
+
 ## Overview
 
 EDI is a public-data NBA defense model. It breaks player defense into five separate scores instead of forcing everything into one black-box number.
