@@ -100,6 +100,6 @@ Academic project. Not affiliated with the NBA.
 
 ---
 
-## Star History
+## GitHub Stars
 
-[![Star History Chart](https://api.star-history.com/svg?repos=garroshub/NBA-Enhanced-Defensive-Index&type=Date)](https://www.star-history.com/#garroshub/NBA-Enhanced-Defensive-Index&Date)
+[![GitHub stars](https://img.shields.io/github/stars/garroshub/NBA-Enhanced-Defensive-Index?style=social)](https://github.com/garroshub/NBA-Enhanced-Defensive-Index/stargazers)
